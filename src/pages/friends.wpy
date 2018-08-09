@@ -1,0 +1,23 @@
+<style lang="less">
+</style>
+<template>
+  <view class="container">
+    <view>
+      <open-data type="userNickName" lang="zh_CN"></open-data>
+    </view>
+    <view>
+      朋友
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+
+  export default class Friend extends wepy.page {
+    config = {
+      navigationBarTitleText: '交友'
+    }
+  }
+</script>

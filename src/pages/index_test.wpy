@@ -1,0 +1,23 @@
+<style lang="less">
+</style>
+<template>
+  <view class="container">
+    <view>
+      <open-data type="userNickName" lang="zh_CN"></open-data>
+    </view>
+    <view>
+      首页
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '首页'
+    }
+  }
+</script>

@@ -1,0 +1,23 @@
+<style lang="less">
+</style>
+<template>
+  <view class="container">
+    <view>
+      <open-data type="userNickName" lang="zh_CN"></open-data>
+    </view>
+    <view>
+      消息
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+
+  export default class Message extends wepy.page {
+    config = {
+      navigationBarTitleText: '消息'
+    }
+  }
+</script>

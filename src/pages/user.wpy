@@ -1,0 +1,23 @@
+<style lang="less">
+</style>
+<template>
+  <view class="container">
+    <view>
+      <open-data type="userNickName" lang="zh_CN"></open-data>
+    </view>
+    <view>
+      用户
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+
+  export default class User extends wepy.page {
+    config = {
+      navigationBarTitleText: '用户'
+    }
+  }
+</script>
