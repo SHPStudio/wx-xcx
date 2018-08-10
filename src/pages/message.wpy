@@ -2,22 +2,20 @@
 </style>
 <template>
   <view class="container">
-    <view>
-      <open-data type="userNickName" lang="zh_CN"></open-data>
-    </view>
-    <view>
-      消息
-    </view>
+      <nosupport></nosupport>
   </view>
 </template>
 
 <script>
   import wepy from 'wepy'
-
+  import nosupport from '../components/no-support'
 
   export default class Message extends wepy.page {
     config = {
       navigationBarTitleText: '消息'
+    }
+    components = {
+      nosupport: nosupport
     }
   }
 </script>

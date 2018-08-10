@@ -1,0 +1,53 @@
+<style lang="less" scoped>
+    .menu-item {
+      width: 100%;
+      height: 70rpx;
+      padding-bottom: 10rpx;
+      padding-top: 10rpx;
+      padding-left: 5rpx;
+      padding-right: 5rpx;
+      position: relative;
+      image {
+        width: 40rpx;
+        height: 40rpx;
+        position: absolute;
+        top: 50%;
+        margin-top: -20rpx;
+        left: 40rpx;
+      }
+      text {
+        line-height: 70rpx;
+        font-size: 30rpx;
+        position: absolute;
+        left: 120rpx;
+      }
+    }
+    .menu-item-hover-class {
+      background: #DCDCDC;
+    }
+
+</style>
+<template>
+  <view class="menu-item" @tap="goTo" hover-class="menu-item-hover-class">
+    <image src="{{item.url}}"></image>
+    <text>{{item.text}}</text>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+
+  export default class MenuItem extends wepy.component {
+    props = {
+      item: {}
+    }
+    data = {
+    }
+    methods = {
+      goTo() {
+        wx.navigateTo({
+          url: this.item.path
+        })
+      }
+    }
+  }
+</script>

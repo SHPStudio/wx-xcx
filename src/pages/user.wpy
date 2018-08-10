@@ -1,23 +1,86 @@
 <style lang="less">
+  .user-info {
+    height: 200rpx;
+    margin-top: 10rpx;
+    width: 100%;
+    padding: 10rpx;
+    background: #fff;
+    position: relative;
+  }
+  .user-info image {
+    width: 150rpx;
+    height: 150rpx;
+    border: 1px solid #f7f7f7;
+    vertical-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50rpx;
+    margin-top: -75rpx;
+  }
+  .user-info text {
+    position: absolute;
+    height: 20rpx;
+    left: 220rpx;
+    top: 50%;
+    margin-top: -30rpx;
+  }
+
+  .menu {
+    background: #fff;
+    margin-top: 20rpx;
+    width: 100%;
+  }
 </style>
 <template>
   <view class="container">
-    <view>
-      <open-data type="userNickName" lang="zh_CN"></open-data>
-    </view>
-    <view>
-      用户
+    <div wx:if="{{show}}" style="width: 100%">
+      <view  class="user-info">
+        <image src="{{userInfo.avatarUrl}}"></image>
+        <text>{{userInfo.nickName}}</text>
+      </view>
+      <view class="menu">
+          <menu :menulist="menuList"></menu>
+      </view>
+    </div>
+    <view wx:else style="margin-top: 50%;">
+      <button size="mini" plain="true" open-type="getUserInfo" @getuserinfo="getUserInfo">获取用户信息</button>
     </view>
   </view>
 </template>
 
 <script>
   import wepy from 'wepy'
-
+  import menu from '../components/menu/menu'
 
   export default class User extends wepy.page {
     config = {
-      navigationBarTitleText: '用户'
+      navigationBarTitleText: '用户',
+    }
+    components = {
+      menu: menu
+    }
+    data = {
+      show: false,
+      userInfo: {
+        avatarUrl: '',
+        nickName: ''
+      },
+      menuList:{
+        list:  [
+          {url: "../image/happy1.png", text: "测试", path: "/pages/index"},
+          {url: "../image/happy1.png", text: "测试", path: "/pages/index"},
+          {url: "../image/happy1.png", text: "测试", path: "/pages/index"},
+          {url: "../image/happy1.png", text: "测试", path: "/pages/index"}
+        ]
+      }
+    }
+    methods = {
+      getUserInfo(result) {
+        console.log(result);
+        this.userInfo.avatarUrl = result.detail.userInfo.avatarUrl;
+        this.userInfo.nickName = result.detail.userInfo.nickName;
+        this.show = true;
+      }
     }
   }
 </script>

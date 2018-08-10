@@ -1,0 +1,41 @@
+<style lang="less" scoped>
+  .no-support {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+  }
+  .no-support .my-v {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    width: 200rpx;
+    margin-left: -100rpx;
+  }
+  .my-v p {
+    display: block;
+    line-height: 30rpx;
+    font-size: 30rpx;
+    width: 100%;
+    text-align: center;
+    margin-left: 1rpx;
+  }
+</style>
+<template>
+  <view class="no-support">
+    <view class="my-v">
+      <icon type="warn" size="{{size}}"/>
+      <p>暂不支持</p>
+    </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+
+  export default class NoSupport extends wepy.component {
+    data = {
+      size: '100'
+    }
+  }
+</script>

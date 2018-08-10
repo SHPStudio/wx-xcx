@@ -2,22 +2,20 @@
 </style>
 <template>
   <view class="container">
-    <view>
-      <open-data type="userNickName" lang="zh_CN"></open-data>
-    </view>
-    <view>
-      朋友
-    </view>
+    <nosupport></nosupport>
   </view>
 </template>
 
 <script>
   import wepy from 'wepy'
-
+  import nosupport from '../components/no-support'
 
   export default class Friend extends wepy.page {
     config = {
       navigationBarTitleText: '交友'
+    }
+    components = {
+      nosupport:nosupport
     }
   }
 </script>

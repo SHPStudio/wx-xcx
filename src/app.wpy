@@ -7,6 +7,9 @@
   justify-content: space-between;
   box-sizing: border-box;
 }
+  page {
+    background: #f7f7f7;
+  }
 </style>
 
 <script>
@@ -27,7 +30,8 @@ export default class extends wepy.app {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
       navigationBarTitleText: 'WeChat',
-      navigationBarTextStyle: 'black'
+      navigationBarTextStyle: 'black',
+      backgroundColor: "#f7f7f7"
     },
     tabBar: {
       selectedColor: "#353535",
@@ -71,6 +75,10 @@ export default class extends wepy.app {
   }
 
   onLaunch() {
+    wx.setTabBarBadge({
+      index: 2,
+      text: '1'
+    })
   }
 }
 </script>

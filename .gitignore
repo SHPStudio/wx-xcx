@@ -1,3 +1,9 @@
 node_modules
 dist
 .DS_Store
+.idea
+.idea/inspectionProfiles/
+.idea/misc.xml
+.idea/modules.xml
+.idea/workspace.xml
+.idea/wx-xcx.iml

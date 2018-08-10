@@ -1,0 +1,48 @@
+<style lang="less" scoped>
+  .line-css {
+    height: 1rpx;
+    background: #DCDCDC;
+    margin-left:50rpx;
+    margin-right:50rpx;
+
+  }
+</style>
+<template>
+  <view class="menu">
+    <div wx:if="{{menulist.list.length > 1}}">
+      <repeat for="{{menulist.list}}" item="item" index="index">
+        <menuitem :item="item"></menuitem>
+        <view wx:if="{{index != menulist.list.length -1}}" class="line-css"></view>
+      </repeat>
+    </div>
+    <div wx:else>
+      <menuitem :item="menuOneItem"></menuitem>
+    </div>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import menuitem from './menu-item'
+
+  export default class Menu extends wepy.component {
+    components = {
+      menuitem:menuitem
+    }
+    props = {
+      menulist: {}
+    }
+    data = {
+    }
+    methods = {
+      showMenu() {
+        console.log(this.menulist);
+      }
+    }
+    computed = {
+      menuOneItem () {
+        return this.menulist.list[0];
+      }
+    }
+
+  }
+</script>
