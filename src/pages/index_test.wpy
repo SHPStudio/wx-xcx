@@ -3,19 +3,24 @@
 <template>
   <view class="container">
     <repeat for="{{dataList}}" index="index" item="item" key="key">
-        <text>{{item.name}}-{{index}}-{{key}}</text>
+        <single></single>
     </repeat>
   </view>
 </template>
 
 <script>
   import wepy from 'wepy'
-
+  import Single from '../components/single/single'
 
   export default class Index extends wepy.page {
     config = {
       navigationBarTitleText: '首页'
     }
+
+    components = {
+      single: Single
+    }
+
     data = {
         dataList: [
           {key: "1",name: "11"},

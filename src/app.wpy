@@ -6,6 +6,8 @@
   align-items: center;
   justify-content: space-between;
   box-sizing: border-box;
+  padding-bottom: 20rpx;
+  padding-top: 10rpx;
 }
   page {
     background: #f7f7f7;

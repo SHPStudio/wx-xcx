@@ -1,0 +1,87 @@
+<style lang="less" scoped>
+  .single {
+    background: #fff;
+    width: 95%;
+    border-radius: 10rpx;
+    margin-top: 20rpx;
+    box-shadow: 0px 0px 5px 2px  #dcdcdc;
+    text-align: center;
+    padding: 10rpx;
+
+    image {
+      width: 95%;
+      height: 350rpx;
+      border-radius: 10rpx;
+    }
+
+    panel.info {
+      display: block;
+      width: 95%;
+      text-align: left;
+      padding-left: 17rpx;
+      margin-top: 20rpx;
+      text {
+        font-size: 35rpxrpx;
+        display: block;
+      }
+
+      view.info-text {
+        margin-top: 10rpx;
+        height: 40rpx;
+        line-height: 40rpx;
+        image {
+          width: 40rpx;
+          height: 40rpx;
+        }
+
+        text {
+          color: #888888;
+          font-size: 23rpx;
+          display: inline-block;
+          vertical-align: top;
+          margin-top: 3rpx;
+        }
+
+        text.age {
+          margin-left: 30rpx;
+        }
+
+        text.depart {
+          margin-left: 30rpx;
+        }
+      }
+    }
+  }
+</style>
+<template>
+  <view class="single" >
+    <image mode="top" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533999024496&di=bec99152d7479a689630620a6f9e3dc5&imgtype=0&src=http%3A%2F%2Fpic2.52pk.com%2Ffiles%2F160216%2F5329500_160443_1.png"></image>
+    <panel class="info">
+      <text>Shape</text>
+      <view class="info-text">
+        <image src="../../image/sex/man.png"></image>
+        <text class="address">贵州 六盘水市</text>
+        <text class="age">96年摩羯座</text>
+        <text class="depart">商家研发部-商家运营部</text>
+      </view>
+    </panel>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+
+  export default class Single extends wepy.component {
+    props = {
+      item: {}
+    }
+    data = {
+    }
+    methods = {
+      goTo() {
+        wx.navigateTo({
+          url: this.item.path
+        })
+      }
+    }
+  }
+</script>
