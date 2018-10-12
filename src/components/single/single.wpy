@@ -1,4 +1,4 @@
-<style lang="less" scoped>
+<style lang="less" >
   .single {
     background: #fff;
     width: 95%;
@@ -55,7 +55,7 @@
 </style>
 <template>
   <view class="single" >
-    <image mode="top" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533999024496&di=bec99152d7479a689630620a6f9e3dc5&imgtype=0&src=http%3A%2F%2Fpic2.52pk.com%2Ffiles%2F160216%2F5329500_160443_1.png"></image>
+    <image mode="top" src="http://www.pptbz.com/pptpic/UploadFiles_6909/201211/2012111719294197.jpg"></image>
     <panel class="info">
       <text>Shape</text>
       <view class="info-text">

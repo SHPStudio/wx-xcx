@@ -81,6 +81,7 @@ export default class extends wepy.app {
       index: 2,
       text: '1'
     })
+
   }
 }
 </script>

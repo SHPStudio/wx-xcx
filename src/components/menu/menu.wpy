@@ -1,4 +1,4 @@
-<style lang="less" scoped>
+<style lang="less" >
   .line-css {
     height: 1rpx;
     background: #DCDCDC;

@@ -1,24 +1,33 @@
 <style lang="less">
 </style>
 <template>
-  <view class="container">
-    <repeat for="{{dataList}}" index="index" item="item" key="key">
+    <view class="container">
+        <!--<repeat for="{{dataList}}" index="index" item="item" key="key">-->
+          <!--<single></single>-->
+        <!--</repeat>-->
+      <block wx:for-items="{{dataList}}" wx:for-index="index" wx:for-item="item" wx:key="key">
         <single></single>
-    </repeat>
-  </view>
+      </block>
+
+    </view>
+    <zanDialog/>
 </template>
 
 <script>
   import wepy from 'wepy'
   import Single from '../components/single/single'
+  import zanDialog from '../components/dialog/zan-dialog'
+  import UserInfoMixin from '../mixins/user-info'
 
   export default class Index extends wepy.page {
     config = {
-      navigationBarTitleText: '首页'
+      navigationBarTitleText: '首页',
+      enablePullDownRefresh: true,
     }
 
     components = {
-      single: Single
+      single: Single,
+      zanDialog,
     }
 
     data = {
@@ -26,7 +35,90 @@
           {key: "1",name: "11"},
           {key: "2",name: "12"},
           {key: "3",name: "13"}
+        ],
+        userInfo: {
+          code: {},
+          user: {}
+        }
+    }
+
+    methods = {
+    }
+
+    mixins= [UserInfoMixin]
+
+    getUserInfo() {
+      this.$invoke('zanDialog', 'showZanDialog', {
+        title: '认证',
+        content: '请先认证信息',
+        buttons:[
+          {
+            text: '取消',
+            type: 'cancel'
+          },
+          {
+            text: '授权',
+            type: 'xxxx',
+            opentype: "getUserInfo"
+          }
         ]
+      }).then((e) => {
+        this.userInfo.user = e.detail.userInfo;
+        this.setToStorage(this.userInfoStorageKey, e.detail.userInfo)
+      }).catch(() => {
+        console.log('=== dialog ===', 'type: cancel')
+      })
+    }
+    getUserSetting() {
+      var _this = this;
+      wx.getSetting({
+        success(res) {
+          let authSetting = res.authSetting;
+          if (authSetting["scope.userInfo"]) {
+            _this.getUserInfoSlience()
+          }else {
+            _this.getUserInfo()
+          }
+        }
+      })
+    }
+
+    getUserInfoSlience() {
+      var _this = this;
+      wx.getUserInfo({
+        success(res) {
+          console.log("静默获取用户信息:" + JSON.stringify(res.userInfo))
+          _this.setToStorage(_this.userInfoStorageKey, res.userInfo);
+        }
+      })
+    }
+
+    onPullDownRefresh() {
+      console.log("xiala")
+      setTimeout(()=> {
+        this.dataList.push({key: "4",name: "13"});
+        wx.stopPullDownRefresh();
+      },1000)
+
+    }
+
+    onReachBottom() {
+      console.log("处理")
+    }
+
+    onLoad() {
+      var _this = this;
+      // 检查缓存中是否存在
+      _this.getFromStorage(_this.userInfoStorageKey,(res) => {
+        console.log(res)
+        if (res == null) {
+          console.log("未授权开始执行授权处理")
+          // 获取授权设置
+          _this.getUserSetting()
+        }else {
+          console.log("已有授权信息")
+        }
+      });
     }
   }
 </script>
