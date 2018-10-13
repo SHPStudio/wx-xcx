@@ -96,18 +96,30 @@
     onPullDownRefresh() {
       console.log("xiala")
       setTimeout(()=> {
-        this.dataList.push({key: "4",name: "13"});
+        this.dataList.unshift({key: "4",name: "13"});
         wx.stopPullDownRefresh();
+        this.$apply();
       },1000)
 
     }
 
     onReachBottom() {
       console.log("处理")
+      wx.showLoading({title:"玩儿命加载中"})
+      setTimeout(()=> {
+        this.dataList.push({key: "4",name: "13"},{key: "4",name: "13"},{key: "4",name: "13"},{key: "4",name: "13"});
+        wx.hideLoading();
+        this.$apply();
+      },1000)
     }
 
     onLoad() {
       var _this = this;
+      wx.login({
+        success(res) {
+          console.log(res)
+        }
+      })
       // 检查缓存中是否存在
       _this.getFromStorage(_this.userInfoStorageKey,(res) => {
         console.log(res)
