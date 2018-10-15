@@ -16,6 +16,9 @@
 
 <script>
 import wepy from 'wepy'
+import Interceptors from './interceptor/interceptors'
+import StorageUtil from './util/storage-util'
+import EventBus from './util/event-bus'
 import 'wepy-async-function'
 
 
@@ -26,7 +29,8 @@ export default class extends wepy.app {
       'pages/index',
       'pages/friends',
       'pages/message',
-      'pages/user'
+      'pages/user',
+      'pages/user_info'
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -68,12 +72,26 @@ export default class extends wepy.app {
   }
 
   globalData = {
-    userInfo: null
+    userInfo: null,
+    backUrl: 'http://192.168.137.1:8080/',
+    userInfoStorageKey: "userInfo",
+    userInfoSessionKey: "sessionkey",
+    eventBus: EventBus
   }
 
   constructor () {
     super()
-    this.use('requestfix')
+    this.use('requestfix');
+    this.getFromStorage = StorageUtil.getFromStorage;
+    this.setToStorage = StorageUtil.setToStorage;
+    this.getFromStorageSync = StorageUtil.getFromStorageSync;
+    this.setToStorageSync = StorageUtil.setToStorageSync;
+    this.setUserInfoToStorage = StorageUtil.setUserInfoToStorage;
+    this.getCodeAndLogin = StorageUtil.getCodeAndLogin;
+    this.commonRequest= StorageUtil.commonRequest;
+    this.login = StorageUtil.login;
+    this.intercept('login', Interceptors.login);
+    this.intercept('request', Interceptors.request);
   }
 
   onLaunch() {

@@ -51,7 +51,6 @@
 <script>
   import wepy from 'wepy'
   import menu from '../components/menu/menu'
-  import UserInfoMixin from '../mixins/user-info'
 
   export default class User extends wepy.page {
     config = {
@@ -61,7 +60,6 @@
       menu: menu
     }
 
-    mixins = [UserInfoMixin];
 
     data = {
       show: false,
@@ -80,7 +78,7 @@
     }
     methods = {
       getUserInfo(result) {
-        this.setToStorage(this.userInfoStorageKey, result.detail.userInfo)
+        this.$parent.setUserInfoToStorage(this.$parent.globalData.userInfoStorageKey, result.detail.userInfo)
         this.userInfo.avatarUrl = result.detail.userInfo.avatarUrl;
         this.userInfo.nickName = result.detail.userInfo.nickName;
         this.show = true;
@@ -90,7 +88,7 @@
     onShow() {
       var _this = this;
       // 检查缓存中是否存在
-      _this.getFromStorage(_this.userInfoStorageKey,(res) => {
+      _this.$parent.getFromStorage(_this.$parent.globalData.userInfoStorageKey,(res) => {
         if (res == null) {
           console.log("用户页未授权开始执行授权处理")
           _this.show = false;

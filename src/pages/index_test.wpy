@@ -2,13 +2,10 @@
 </style>
 <template>
     <view class="container">
-        <!--<repeat for="{{dataList}}" index="index" item="item" key="key">-->
-          <!--<single></single>-->
-        <!--</repeat>-->
-      <block wx:for-items="{{dataList}}" wx:for-index="index" wx:for-item="item" wx:key="key">
-        <single></single>
-      </block>
-
+        <repeat for="{{dataList}}" index="index" item="item" key="key">
+          <single :item="item"></single>
+        </repeat>
+        <block wx:if="{{noData}}">已经到底啦</block>
     </view>
     <zanDialog/>
 </template>
@@ -23,6 +20,7 @@
     config = {
       navigationBarTitleText: '首页',
       enablePullDownRefresh: true,
+      onReachBottomDistance: 1
     }
 
     components = {
@@ -32,14 +30,17 @@
 
     data = {
         dataList: [
-          {key: "1",name: "11"},
-          {key: "2",name: "12"},
-          {key: "3",name: "13"}
         ],
         userInfo: {
           code: {},
           user: {}
-        }
+        },
+        page: {
+          pageIndex: 1,
+          pageSize: 5,
+          totalPage: 0
+        },
+        noData: false
     }
 
     methods = {
@@ -47,90 +48,59 @@
 
     mixins= [UserInfoMixin]
 
-    getUserInfo() {
-      this.$invoke('zanDialog', 'showZanDialog', {
-        title: '认证',
-        content: '请先认证信息',
-        buttons:[
-          {
-            text: '取消',
-            type: 'cancel'
-          },
-          {
-            text: '授权',
-            type: 'xxxx',
-            opentype: "getUserInfo"
-          }
-        ]
-      }).then((e) => {
-        this.userInfo.user = e.detail.userInfo;
-        this.setToStorage(this.userInfoStorageKey, e.detail.userInfo)
-      }).catch(() => {
-        console.log('=== dialog ===', 'type: cancel')
-      })
-    }
-    getUserSetting() {
-      var _this = this;
-      wx.getSetting({
-        success(res) {
-          let authSetting = res.authSetting;
-          if (authSetting["scope.userInfo"]) {
-            _this.getUserInfoSlience()
-          }else {
-            _this.getUserInfo()
-          }
-        }
-      })
-    }
-
-    getUserInfoSlience() {
-      var _this = this;
-      wx.getUserInfo({
-        success(res) {
-          console.log("静默获取用户信息:" + JSON.stringify(res.userInfo))
-          _this.setToStorage(_this.userInfoStorageKey, res.userInfo);
-        }
-      })
-    }
-
     onPullDownRefresh() {
       console.log("xiala")
-      setTimeout(()=> {
-        this.dataList.unshift({key: "4",name: "13"});
+      if (this.page.pageIndex > this.page.totalPage) {
+        wx.showToast({title:"帅哥美女库存已空，来推荐几个吧", icon: "none"})
         wx.stopPullDownRefresh();
-        this.$apply();
-      },1000)
-
+      }else {
+        this.$parent.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, this.topLoadData.bind(this), false);
+      }
     }
 
     onReachBottom() {
       console.log("处理")
-      wx.showLoading({title:"玩儿命加载中"})
-      setTimeout(()=> {
-        this.dataList.push({key: "4",name: "13"},{key: "4",name: "13"},{key: "4",name: "13"},{key: "4",name: "13"});
-        wx.hideLoading();
-        this.$apply();
-      },1000)
+      if (this.page.pageIndex > this.page.totalPage) {
+        this.noData = true;
+      }else {
+        this.$parent.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, this.downLoadData.bind(this), false);
+      }
+    }
+
+    loadData(data) {
+      console.log(data)
+      this.dataList = data.dataList;
+      this.page.pageIndex += 1;
+      this.page.totalPage = data.totalPage;
+      this.$apply();
+    }
+
+    topLoadData(data) {
+      console.log(data)
+      wx.stopPullDownRefresh();
+      this.dataList.unshift(data.dataList);
+      this.page.pageIndex += 1;
+      this.page.totalPage = data.totalPage;
+      this.$apply();
+    }
+
+    downLoadData(data) {
+      console.log(data)
+      this.dataList.push(data.dataList);
+      this.page.pageIndex += 1;
+      this.page.totalPage = data.totalPage;
+      this.$apply();
+    }
+
+    getUserSuccess() {
+      console.log("获得用户信息成功")
+      // 开始获取数据
+      this.$parent.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, this.loadData.bind(this), true);
     }
 
     onLoad() {
-      var _this = this;
-      wx.login({
-        success(res) {
-          console.log(res)
-        }
-      })
-      // 检查缓存中是否存在
-      _this.getFromStorage(_this.userInfoStorageKey,(res) => {
-        console.log(res)
-        if (res == null) {
-          console.log("未授权开始执行授权处理")
-          // 获取授权设置
-          _this.getUserSetting()
-        }else {
-          console.log("已有授权信息")
-        }
-      });
+      console.log("注册用户授权事件")
+      this.$parent.globalData.eventBus.on("getuser", this.getUserSuccess.bind(this))
     }
   }
 </script>

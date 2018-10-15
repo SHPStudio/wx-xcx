@@ -1,0 +1,13 @@
+<template>
+    userinfo
+</template>
+
+<script>
+  import wepy from 'wepy'
+  export default class UserInfo extends wepy.page {
+  };
+</script>
+
+<style>
+
+</style>
