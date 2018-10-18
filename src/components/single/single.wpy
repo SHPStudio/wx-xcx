@@ -55,14 +55,14 @@
 </style>
 <template>
   <view class="single" @tap="goTo">
-    <image mode="top" src="http://www.pptbz.com/pptpic/UploadFiles_6909/201211/2012111719294197.jpg"></image>
+    <image mode="top"  src="{{item.photos[0]}}"></image>
     <panel class="info">
       <text>{{item.name}}</text>
       <view class="info-text">
-        <image src="../../image/sex/man.png"></image>
-        <text class="address">贵州 六盘水市</text>
-        <text class="age">96年摩羯座</text>
-        <text class="depart">商家研发部-商家运营部</text>
+        <image src="{{item.sex == 0 ? boyUrl:girlUrl}}"></image>
+        <text class="address">{{item.jiguan}}</text>
+        <text class="age">{{item.birthday}}年{{item.constellation}}</text>
+        <text class="depart">{{item.department}}</text>
       </view>
     </panel>
   </view>
@@ -75,6 +75,8 @@
       item: {}
     }
     data = {
+      boyUrl: '/image/sex/man.png',
+      girlUrl: '/image/sex/woman.png'
     }
     methods = {
       goTo() {
@@ -84,6 +86,7 @@
         })
       }
     }
-
+    watch = {
+    }
   }
 </script>

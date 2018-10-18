@@ -1,0 +1,52 @@
+<style lang="less" >
+  .girl-back {
+    background: #FF4081;
+  }
+  .boy-back {
+    background: #07B0FF;
+  }
+  .sex-info{
+    display: flex;
+    width: 150rpx;
+    height: 40rpx;
+    border-radius: 10rpx;
+    padding: 2rpx;
+    margin-top: 2rpx;
+    align-items: center;
+    justify-content: center;
+    text {
+      font-size: 20rpx;
+      color:#ffffff;
+    }
+    image.sex {
+      width: 24rpx;
+      height: 24rpx;
+      margin-right: 8rpx;
+    }
+  }
+</style>
+<template>
+  <view  class="sex-info {{sex == 0 ? 'boy-back': 'girl-back'}}">
+    <image class="sex" src="{{sex == 0 ? '/image/sex/boy.png' : '/image/sex/girl.png'}}"></image>
+    <text>{{text}}</text>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+
+  export default class SexInfo extends wepy.component {
+    props = {
+      sex: {type:Number, default: 0},
+      text: {type:String, default: ""},
+      index:{}
+    }
+    data = {
+    }
+    methods = {
+    }
+
+    onLoad() {
+      console.log(this)
+    }
+  }
+</script>

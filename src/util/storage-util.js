@@ -42,7 +42,6 @@ export default {
       data: data,
       success(res) {
         console.log("存储用户调用成功" + JSON.stringify(res))
-        // _this.login();
         _this.globalData.eventBus.emit("getuser");
       },
       fail(res) {
@@ -101,7 +100,6 @@ export default {
             sucFuc(false)
           }
         })
-        // this.globalData.eventBus.emit("loginsuccess");
       }
     })
   },

@@ -25,7 +25,7 @@
 
     components = {
       single: Single,
-      zanDialog,
+      zanDialog
     }
 
     data = {
@@ -38,9 +38,10 @@
         page: {
           pageIndex: 1,
           pageSize: 5,
-          totalPage: 0
+          totalPage: 1
         },
-        noData: false
+        noData: false,
+        load:true
     }
 
     methods = {
@@ -69,16 +70,41 @@
 
     loadData(data) {
       console.log(data)
-      this.dataList = data.dataList;
+      this.dataList = this.processData(data.dataList);
       this.page.pageIndex += 1;
       this.page.totalPage = data.totalPage;
       this.$apply();
     }
 
+    processData(dataList) {
+      let _this = this;
+      let result = dataList.map(item => {
+        return {
+          openId: item.openId,
+          photos: _this.processImageUrl(item.photos),
+          department: item.department,
+          jiguan: `${item.province} ${item.city}`,
+          name: item.name,
+          birthday: item.birthday.substring(2,4),
+          sex: item.sex,
+          constellation: _this.$parent.globalData.constellationList[item.constellation],
+          path: `/pages/user_info?openId=${item.openId}`
+        }
+      })
+      console.log("处理的", result)
+      return result;
+    }
+
+    processImageUrl(photoListStr) {
+      let imageUrl = this.$parent.globalData.imageUrl;
+      let result = JSON.parse(photoListStr).map(item => `${imageUrl}${item}`)
+      return result;
+    }
+
     topLoadData(data) {
       console.log(data)
       wx.stopPullDownRefresh();
-      this.dataList.unshift(data.dataList);
+      this.dataList.unshift(this.processData(data.dataList));
       this.page.pageIndex += 1;
       this.page.totalPage = data.totalPage;
       this.$apply();
@@ -86,7 +112,7 @@
 
     downLoadData(data) {
       console.log(data)
-      this.dataList.push(data.dataList);
+      this.dataList.push(this.processData(data.dataList));
       this.page.pageIndex += 1;
       this.page.totalPage = data.totalPage;
       this.$apply();

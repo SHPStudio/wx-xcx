@@ -78,7 +78,7 @@
     }
     methods = {
       getUserInfo(result) {
-        this.$parent.setUserInfoToStorage(this.$parent.globalData.userInfoStorageKey, result.detail.userInfo)
+        this.$parent.setToStorageSync(this.$parent.globalData.userInfoStorageKey, result.detail.userInfo)
         this.userInfo.avatarUrl = result.detail.userInfo.avatarUrl;
         this.userInfo.nickName = result.detail.userInfo.nickName;
         this.show = true;
@@ -98,6 +98,7 @@
           _this.userInfo.nickName = res.nickName;
           _this.show = true;
         }
+        this.$apply();
       });
       // wx.getStorage({
       //   key: "userInfo",

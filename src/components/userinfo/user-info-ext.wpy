@@ -1,0 +1,53 @@
+<style lang="less" >
+  .user-ext-info {
+    width: 100%;
+    margin-top: 25rpx;
+    margin-bottom: 15rpx;
+
+    .title {
+      text {
+        font-size: 28rpx;
+        color: #ababab
+      }
+    }
+    .content {
+      margin-top: 10rpx;
+      text-indent: 50rpx;
+      font-size: 25rpx;
+    }
+  }
+  .line {
+    width: 100%;
+    height: 3rpx;
+    background: #dedede;
+  }
+
+</style>
+<template>
+  <view class="user-ext-info">
+    <view class="title">
+      <text>{{title}}</text>
+    </view>
+    <view class="line"></view>
+    <view class="content">
+      <text>{{text}}</text>
+    </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+
+  export default class extends wepy.component {
+    props = {
+      title: String,
+      text: String
+    }
+    data = {
+    }
+    methods = {
+    }
+
+    onLoad() {
+    }
+  }
+</script>

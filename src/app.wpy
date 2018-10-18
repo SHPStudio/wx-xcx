@@ -12,6 +12,11 @@
   page {
     background: #f7f7f7;
   }
+
+  .fill-content {
+    display: flex;
+    flex: 1;
+  }
 </style>
 
 <script>
@@ -26,11 +31,11 @@ export default class extends wepy.app {
   config = {
     pages: [
       'pages/index_test',
+      'pages/user_info',
       'pages/index',
       'pages/friends',
       'pages/message',
-      'pages/user',
-      'pages/user_info'
+      'pages/user'
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -74,8 +79,29 @@ export default class extends wepy.app {
   globalData = {
     userInfo: null,
     backUrl: 'http://192.168.137.1:8080/',
+    imageUrl: 'http://192.168.56.102:4869/',
     userInfoStorageKey: "userInfo",
     userInfoSessionKey: "sessionkey",
+    constellationList: [
+      "白羊座",
+      "金牛座",
+      "双子座",
+      "巨蟹座",
+      "狮子座",
+      "处女座",
+      "天秤座",
+      "天蝎座",
+      "射手座",
+      "魔蝎座",
+      "水瓶座",
+      "双鱼座"
+    ],
+    education:[
+      "大专",
+      "本科",
+      "硕士",
+      "博士"
+    ],
     eventBus: EventBus
   }
 
@@ -97,9 +123,8 @@ export default class extends wepy.app {
   onLaunch() {
     wx.setTabBarBadge({
       index: 2,
-      text: '1'
+      text: ''
     })
-
   }
 }
 </script>

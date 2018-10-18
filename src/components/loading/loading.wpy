@@ -1,0 +1,36 @@
+<template>
+    <view class="custom-load">
+      <image mode="center" src="{{img}}" class="custom-load-image"></image>
+    </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  export default class Loading extends wepy.component {
+    props = {
+      load: false
+    }
+    data = {
+      img: '/image/load/load.gif'
+    }
+  };
+</script>
+
+<style lang="less">
+    .custom-load {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background: #ffffff;
+    }
+    .custom-load-image {
+      position: absolute;
+      top: 30%;
+      margin-left: -100rpx;
+      left: 50%;
+      width: 200rpx;
+      height: 320rpx;
+    }
+</style>
