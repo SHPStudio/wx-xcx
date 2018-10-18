@@ -1,0 +1,132 @@
+<template>
+    <view class="container user-set-info">
+      <view class="title">请至少上传一张个人照片</view>
+      <view class="content user-photo">
+        <view class="photo big-photo"  @tap="choosePhoto(0)">
+          <image src="{{photos[0]}}" wx:if="{{photos[0] != null}}"></image>
+          <text wx:else>+</text>
+        </view>
+        <view style="flex:1">
+          <view class="photo small-photo" @tap="choosePhoto(1)"> <text>+</text></view>
+          <view class="photo small-photo" style="margin-top: 0" @tap="choosePhoto(2)"><text>+</text></view>
+        </view>
+      </view>
+      <view class="title">基本信息</view>
+      <view class="content base-info">
+        <view class="text-input"><text>昵称</text><view style="flex:1;"></view><input placeholder="这个只有在按钮点击的时候才聚焦" autofocus/></view>
+
+      </view>
+    </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  export default class extends wepy.page {
+    config = {
+      navigationBarTitleText: '编辑个人信息'
+    }
+
+    data= {
+      photos: []
+    }
+    methods = {
+      choosePhoto(index) {
+        let _this =this;
+        console.log(index)
+        wx.chooseImage({
+          count:1,
+          success(res) {
+            console.log(res)
+            let file = res.tempFiles;
+            console.log(file)
+            if (null == file) {
+              wx.showToast({title:"选择图片异常", icon:"none"})
+            }else {
+              _this.photos[index] = file[index].path;
+            }
+            console.log(_this.photos)
+            _this.$apply();
+          }
+        })
+      }
+    }
+  };
+</script>
+
+<style lang="less">
+  .user-set-info {
+    padding-top: 0;
+
+    .title {
+      font-size: 25rpx;
+      color:#515a6e;
+      height: 70rpx;
+      margin-left: 50rpx;
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .content {
+      background: #ffffff;
+      width: 100%;
+    }
+
+    .text-input {
+      width: 100%;
+      display: flex;
+      height: 50rpx;
+      font-size: 30rpx;
+      align-items: center;
+      margin-left: 25rpx;
+      margin-right: 25rpx;
+
+      input {
+        width: 50%;
+      }
+    }
+
+    .base-info {
+      padding: 15rpx;
+    }
+
+    .user-photo {
+      height: 500rpx;
+      display: flex;
+      align-conent: center;
+
+      .photo {
+        border-radius: 10rpx;
+        background: #dedede;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        text {
+          font-size: 80rpx;
+          color: white;
+        }
+
+        image {
+          border-radius: 10rpx;
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      .big-photo {
+        margin: 50rpx;
+        width: 400rpx;
+        height: 400rpx;
+      }
+      .small-photo {
+        margin: 50rpx;
+        width: 200rpx;
+        height: 175rpx;
+        margin-left: 0;
+      }
+    }
+  }
+</style>

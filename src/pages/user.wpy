@@ -1,11 +1,12 @@
 <style lang="less">
   .user-info {
     height: 200rpx;
-    margin-top: 10rpx;
     width: 100%;
-    padding: 10rpx;
-    background: #fff;
+    background: #17233d;
     position: relative;
+    color:white;
+    border-bottom-right-radius: 30rpx;
+    border-bottom-left-radius:  30rpx;
   }
   .user-info image {
     width: 150rpx;
@@ -32,7 +33,7 @@
   }
 </style>
 <template>
-  <view class="container">
+  <view class="container" style="padding-top: 0">
     <div wx:if="{{show}}" style="width: 100%">
       <view  class="user-info">
         <image src="{{userInfo.avatarUrl}}"></image>
