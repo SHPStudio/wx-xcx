@@ -1,0 +1,34 @@
+<style lang="less" >
+  .datepicker{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+</style>
+<template>
+  <picker class="datepicker" mode="date" bindchange="bindPickerChange" value="{{item.date}}" start="1973-01-01" end="2000-12-31">
+    <view class="picker">
+      {{item.date}}
+    </view>
+  </picker>
+</template>
+<script>
+  import wepy from 'wepy'
+
+  export default class extends wepy.component {
+    props = {
+      item: {twoWay: true},
+    }
+    data = {
+    }
+    methods = {
+      bindPickerChange(e) {
+        this.item.date = e.detail.value;
+      }
+    }
+
+    onLoad() {
+      // this.$apply();
+    }
+  }
+</script>

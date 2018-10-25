@@ -17,6 +17,12 @@
     display: flex;
     flex: 1;
   }
+
+.line {
+  width: 100%;
+  height: 3rpx;
+  background: #dedede;
+}
 </style>
 
 <script>
@@ -43,7 +49,7 @@ export default class extends wepy.app {
       navigationBarBackgroundColor: '#17233d',
       navigationBarTitleText: 'WeChat',
       navigationBarTextStyle: 'white',
-      backgroundColor: "#f7f7f7"
+      backgroundColor: "#f7f7f7",
     },
     tabBar: {
       selectedColor: "#353535",

@@ -1,0 +1,34 @@
+<style lang="less" >
+  .simplepicker{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+</style>
+<template>
+  <picker class="simplepicker" bindchange="bindPickerChange" value="{{items.itemIndex}}" range="{{items.items}}">
+    <view class="picker">
+      {{items.items[items.itemIndex]}}
+    </view>
+  </picker>
+</template>
+<script>
+  import wepy from 'wepy'
+
+  export default class extends wepy.component {
+    props = {
+      items: {twoWay: true},
+    }
+    data = {
+    }
+    methods = {
+      bindPickerChange(e) {
+        this.items.itemIndex = e.detail.value;
+      }
+    }
+
+    onLoad() {
+      // this.$apply();
+    }
+  }
+</script>
