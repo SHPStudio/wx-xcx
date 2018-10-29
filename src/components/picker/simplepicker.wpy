@@ -8,7 +8,8 @@
 <template>
   <picker class="simplepicker" bindchange="bindPickerChange" value="{{items.itemIndex}}" range="{{items.items}}">
     <view class="picker">
-      {{items.items[items.itemIndex]}}
+      <text wx:if="{{items.itemIndex != null}}">{{items.items[items.itemIndex]}}</text>
+      <text wx:else>请点击选择</text>
     </view>
   </picker>
 </template>

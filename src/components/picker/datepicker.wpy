@@ -8,7 +8,8 @@
 <template>
   <picker class="datepicker" mode="date" bindchange="bindPickerChange" value="{{item.date}}" start="1973-01-01" end="2000-12-31">
     <view class="picker">
-      {{item.date}}
+      <text wx:if="{{item.date != null && item.date != ''}}">{{item.date}}</text>
+      <text wx:else>请点击选择</text>
     </view>
   </picker>
 </template>

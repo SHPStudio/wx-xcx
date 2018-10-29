@@ -122,9 +122,11 @@ export default class extends wepy.app {
     this.setUserInfoToStorage = StorageUtil.setUserInfoToStorage;
     this.getCodeAndLogin = StorageUtil.getCodeAndLogin;
     this.commonRequest= StorageUtil.commonRequest;
+    this.commonUploadImg= StorageUtil.commonUploadImg;
     this.login = StorageUtil.login;
     this.intercept('login', Interceptors.login);
     this.intercept('request', Interceptors.request);
+    this.intercept('uploadFile', Interceptors.uploadFile);
   }
 
   onLaunch() {

@@ -131,5 +131,30 @@ export default {
         wx.showToast({title: "请求失败，请稍后重试", icon:"none"})
       }
     })
+  },
+  commonUploadImg(url, file, successRes) {
+    wx.showLoading({title: "处理中..."})
+    //检查sessionKey
+    this.login((res) => {
+      if (res) {
+        console.log("sessionKey检查成功")
+        wepy.uploadFile({
+          url: url,
+          filePath: file,
+          name: 'file',
+          success(res) {
+            console.log("成功请求")
+            wx.hideLoading();
+            successRes(res.data)
+          },
+          fail(res) {
+            wx.hideLoading();
+            successRes(null)
+          }
+        })
+      }else {
+        wx.showToast({title: "请求失败，请稍后重试", icon:"none"})
+      }
+    })
   }
 }

@@ -2,18 +2,27 @@
     <scroll-view class="container user-set-info" scroll-y="true">
       <view class="title">请至少上传一张个人照片</view>
       <view class="content user-photo">
-        <view class="photo big-photo"  @tap="choosePhoto(0)">
-          <image src="{{photos[0]}}" wx:if="{{photos[0] != null}}"></image>
-          <text wx:else>+</text>
+        <view class="photo big-photo">
+          <image src="{{imageUrl + userInfo.photos[0]}}" wx:if="{{userInfo.photos[0] != null}}"></image>
+          <text wx:else @tap="choosePhoto(0)">+</text>
+          <icon wx:if="{{userInfo.photos[0] != null}}" type="cancel" color="white" size="40" @tap="deletePhoto(0)"></icon>
         </view>
         <view style="flex:1">
-          <view class="photo small-photo" @tap="choosePhoto(1)"> <text>+</text></view>
-          <view class="photo small-photo" style="margin-top: 0" @tap="choosePhoto(2)"><text>+</text></view>
+          <view class="photo small-photo" >
+            <image src="{{imageUrl + userInfo.photos[1]}}" wx:if="{{userInfo.photos[1] != null}}"></image>
+            <text wx:else @tap="choosePhoto(1)">+</text>
+            <icon wx:if="{{userInfo.photos[1] != null}}" type="cancel" color="white" size="30" @tap="deletePhoto(1)"></icon>
+          </view>
+          <view class="photo small-photo" style="margin-top: 0" >
+            <image src="{{imageUrl + userInfo.photos[2]}}" wx:if="{{photos[2] != null}}"></image>
+            <text wx:else @tap="choosePhoto(2)">+</text>
+            <icon wx:if="{{userInfo.photos[2] != null}}" type="cancel" color="white" size="30" @tap="deletePhoto(2)"></icon>
+          </view>
         </view>
       </view>
       <view class="title">基本信息</view>
       <view class="content base-info">
-        <view class="text-input"><text>昵称</text><view class="fill-content"></view><input placeholder="请输入昵称" autofocus/></view>
+        <view class="text-input"><text>昵称</text><view class="fill-content"></view><input value="{{userInfo.name}}" placeholder="请输入昵称" autofocus/></view>
         <view class="line" style="margin-top: 15rpx;"></view>
         <view class="pick-input" style="margin-top: 15rpx;"><text>性别</text><view class="fill-content"></view>
           <sexpicker :items.sync="sexArray" ></sexpicker>
@@ -24,67 +33,47 @@
         </view>
         <view class="line" style="margin-top: 15rpx;"></view>
         <view class="pick-input" style="margin-top: 15rpx;"><text>星座</text><view class="fill-content"></view>
-          <picker bindchange="bindPickerChange" value="{{index}}" range="{{array}}">
-            <view class="picker">
-              {{array[userInfo.sex]}}
-            </view>
-          </picker>
+          <constellationpicker :items.sync="constellationArray"></constellationpicker>
         </view>
         <view class="line" style="margin-top: 15rpx;"></view>
         <view class="pick-input" style="margin-top: 15rpx;"><text>学历</text><view class="fill-content"></view>
-          <picker bindchange="bindPickerChange" value="{{index}}" range="{{array}}">
-            <view class="picker">
-              {{array[userInfo.sex]}}
-            </view>
-          </picker>
+          <educatepicker :items.sync="educateArray"></educatepicker>
         </view>
         <view class="line" style="margin-top: 15rpx;"></view>
         <view class="pick-input" style="margin-top: 15rpx;"><text>籍贯</text><view class="fill-content"></view>
-          <picker bindchange="bindPickerChange" value="{{index}}" range="{{array}}">
+          <picker mode="region" bindchange="bindCity" value="{{region}}">
             <view class="picker">
-              {{array[userInfo.sex]}}
+              {{region[0]}} {{region[1]}}
             </view>
           </picker>
         </view>
         <view class="line" style="margin-top: 15rpx;"></view>
         <view class="pick-input" style="margin-top: 15rpx;"><text>工作地址</text><view class="fill-content"></view>
-          <picker mode="region" bindchange="bindCity" value="{{region}}">
-            <view class="picker">
-              {{region}}
-            </view>
-          </picker>
+          <input value="{{userInfo.workArea}}" placeholder="请点击输入" autofocus/>
         </view>
         <view class="line" style="margin-top: 15rpx;"></view>
-        <view class="text-input" style="margin-top: 15rpx;"><text>所在部门</text><view class="fill-content"></view><input placeholder="请输入部门(xxx-xxx)"/></view>
+        <view class="text-input" style="margin-top: 15rpx;"><text>所在部门</text><view class="fill-content"></view><input value="{{userInfo.department}}" placeholder="请输入部门(xxx-xxx)"/></view>
         <view class="line" style="margin-top: 15rpx;"></view>
         <view class="pick-input" style="margin-top: 15rpx;"><text>身高(cm)</text><view class="fill-content"></view>
-          <picker bindchange="bindPickerChange" mode="date" value="{{index}}" range="{{array}}">
-            <view class="picker">
-              {{array[userInfo.sex]}}
-            </view>
-          </picker>
+          <tallpicker :items.sync="tallArray"></tallpicker>
         </view>
         <view class="line" style="margin-top: 15rpx;"></view>
         <view class="pick-input" style="margin-top: 15rpx;"><text>体重(kg)</text><view class="fill-content"></view>
-          <picker bindchange="bindPickerChange" value="{{index}}" range="{{array}}">
-            <view class="picker">
-              {{array[userInfo.sex]}}
-            </view>
-          </picker>
+          <fatpicker :items.sync="fatArray"></fatpicker>
         </view>
       </view>
       <view class="title">其他信息</view>
       <view class="content base-info">
-        <view class="text-input"><text>自我评价性格</text><view class="fill-content"></view><input placeholder="请点击输入" autofocus/></view>
+        <view class="text-input"><text>自我评价性格</text><view class="fill-content"></view><input value="{{userInfo.selfEvaluation}}" placeholder="请点击输入" autofocus/></view>
         <view class="line" style="margin-top: 15rpx;"></view>
-        <view class="text-input" style="margin-top: 15rpx;"><text>最想说的话</text><view class="fill-content"></view><input placeholder="请点击输入"/></view>
+        <view class="text-input" style="margin-top: 15rpx;"><text>最想说的话</text><view class="fill-content"></view><input value="{{userInfo.wantSay}}" placeholder="请点击输入"/></view>
         <view class="line" style="margin-top: 15rpx;"></view>
-        <view class="text-input" style="margin-top: 15rpx;"><text>家庭状况</text><view class="fill-content"></view><input placeholder="请点击输入"/></view>
+        <view class="text-input" style="margin-top: 15rpx;"><text>家庭状况</text><view class="fill-content"></view><input value="{{userInfo.family}}" placeholder="请点击输入"/></view>
         <view class="line" style="margin-top: 15rpx;"></view>
-        <view class="text-input" style="margin-top: 15rpx;"><text>交友标准(详细写)</text><view class="fill-content"></view><input placeholder="请点击输入"/></view>
+        <view class="text-input" style="margin-top: 15rpx;"><text>交友标准(详细写)</text><view class="fill-content"></view><input value="{{userInfo.standFriend}}" placeholder="请点击输入"/></view>
       </view>
       <view class="footer">
-        <button type="primary">保存</button>
+        <button type="primary" @tap="submitUserInfo">保存</button>
       </view>
     </scroll-view>
 </template>
@@ -101,25 +90,89 @@
 
     components = {
       sexpicker: simplepicker,
+      constellationpicker: simplepicker,
+      educatepicker: simplepicker,
+      tallpicker: simplepicker,
+      fatpicker: simplepicker,
       datepicker
     }
 
     data= {
       region:['黑龙江省', '大庆市'],
-      photos: [],
-      showCity: false,
-      array: ['男', '女'],
+      imageUrl: '',
+      userSession: {},
+      tallArray: {
+        items: Array.apply(null, {length: 60}).map(function(value, index){
+          return index + 150;
+        }),
+        itemIndex: null
+      },
+      fatArray: {
+        items: Array.apply(null, {length: 60}).map(function(value, index){
+          return index + 40;
+        }),
+        itemIndex: null
+      },
       sexArray: {
         items: ['男', '女'],
-        itemIndex: 0
+        itemIndex: null
+      },
+      educateArray: {
+        items: [
+          "大专",
+          "本科",
+          "硕士",
+          "博士"
+        ],
+        itemIndex: null
       },
       birthdayDate: {
-        date: '1996-01-20'
+        date: ''
       },
       userInfo: {
-        sex: 1
+        name: '1231',
+        sex: 1,
+        workArea: null,
+        province: null,
+        city: null,
+        constellation: null,
+        birthday: null,
+        status: 0,
+        rejectReason: null,
+        department: null,
+        yn: 0,
+        education: null,
+        height: 0,
+        weight: 0,
+        photos:[],
+        selfEvaluation:null,
+        wantSay: null,
+        family: null,
+        standFriend: null,
+        dongdong: null,
+        wxNumber: null
+      },
+      constellationArray: {
+        items: [
+          "白羊座",
+          "金牛座",
+          "双子座",
+          "巨蟹座",
+          "狮子座",
+          "处女座",
+          "天秤座",
+          "天蝎座",
+          "射手座",
+          "魔蝎座",
+          "水瓶座",
+          "双鱼座"
+        ],
+        itemIndex: null
       }
     }
+
+
+
     methods = {
       choosePhoto(index) {
         let _this =this;
@@ -128,25 +181,114 @@
           count:1,
           success(res) {
             console.log(res)
-            let file = res.tempFiles;
+            let file = res.tempFilePaths;
             console.log(file)
             if (null == file) {
               wx.showToast({title:"选择图片异常", icon:"none"})
             }else {
-              _this.photos[index] = file[index].path;
+              // _this.uploadImg(file[0].path)
+              _this.methods.uploadImg(file[0], index, _this)
             }
             console.log(_this.photos)
             _this.$apply();
           }
         })
       },
-      bindPickerChange: function(e) {
-        console.log('picker发送选择改变，携带值为', e.detail.value)
-        this.userInfo.sex = e.detail.value;
+      deletePhoto(index){
+        let md5 = this.userInfo.photos[index];
+        console.log("删除", md5)
+        this.$parent.commonRequest(
+          this.$parent.globalData.backUrl + "user/deleteImg/" + md5,
+          null,
+          (res) => {
+            console.log(res)
+            if (!res) {
+              wx.showToast({"title": "删除图片失败", "icon": "none"})
+            }else {
+              this.userInfo.photos[index] = null;
+              this.$apply()
+            }
+          },
+          true
+        )
+      },
+      uploadImg(file, index, content) {
+        console.log(content)
+        content.$parent.commonUploadImg(
+          content.$parent.globalData.backUrl + "user/uploadImg",
+          file,
+          (res) => {
+            if (res == null) {
+              wx.showToast({"title": "上传异常！", "icon": "none"})
+            }else {
+              console.log(res)
+              let jsr = JSON.parse(res);
+              content.userInfo.photos[index] = jsr.info.md5;
+              content.$apply();
+            }
+          }
+        )
       },
       bindCity(e) {
-        this.showCity = true;
+        this.region = e.detail.value;
+      },
+      submitUserInfo() {
+        if (this.userSession.level == 'guest') {
+          console.log("用户新提交信息")
+          this.userInfo.photos = JSON.stringify(this.userInfo.photos)
+          this.$parent.commonRequest(
+            this.$parent.globalData.backUrl + "user/saveUserInfo",
+            this.userInfo,
+            (res) => {
+              if (res.success) {
+                wx.showToast({"title": "更新成功", "icon": "success"})
+                let setUserSession = {};
+                Object.assign(setUserSession, this.userSession);
+                setUserSession.level = 'user'
+                this.$parent.setToStorage(this.$parent.globalData.userInfoSessionKey, setUserSession);
+              }else {
+                wx.showToast({"title": res.message, "icon": "none"})
+              }
+            },true
+          )
+        }else {
+          console.log("用户更新信息")
+        }
       }
+    }
+
+    loadUserInfo() {
+      let userSession = this.$parent.getFromStorageSync(this.$parent.globalData.userInfoSessionKey)
+      let userInfo = this.$parent.getFromStorageSync(this.$parent.globalData.userInfoStorageKey);
+      this.userSession = userSession;
+      if (userSession['level'] == 'guest') {
+        console.log("游客身份", this)
+        this.processLocalUserInfo(userInfo)
+      }else{
+        console.log("用户身份")
+        if (null == userInfo['sex']) {
+          console.log("需要请求身份数据")
+        }else {
+          this.userInfo = userInfo
+        }
+      }
+    }
+
+    processLocalUserInfo(userInfo) {
+      console.log(userInfo)
+      this.userInfo.name = userInfo.nickName;
+      this.userInfo.sex = userInfo.gender == 1 ? 0 : 1;
+
+      this.sexArray.itemIndex = this.userInfo.sex;
+    }
+
+    processUserInfo(userInfo) {
+
+    }
+
+    onLoad() {
+      this.imageUrl = this.$parent.globalData.imageUrl;
+      this.loadUserInfo()
     }
   };
 </script>
@@ -230,6 +372,9 @@
         text {
           font-size: 80rpx;
           color: white;
+          height: 100%;
+          width: 100%;
+          text-align: center;
         }
 
         image {
@@ -237,18 +382,31 @@
           width: 100%;
           height: 100%;
         }
+
+        icon {
+          position: absolute;
+          top:0rpx;
+          right: 0rpx;
+        }
       }
 
       .big-photo {
         margin: 50rpx;
         width: 400rpx;
         height: 400rpx;
+        text {
+         line-height: 400rpx;
+        }
       }
       .small-photo {
         margin: 50rpx;
         width: 200rpx;
         height: 175rpx;
         margin-left: 0;
+
+        text{
+          line-height: 175rpx;
+        }
       }
     }
 
