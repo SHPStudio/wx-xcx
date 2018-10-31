@@ -36,7 +36,7 @@ export default {
       // 对所有request请求中的OBJECT参数对象统一附加时间戳属性
       let url = p.url;
       if (!url.includes("login")) {
-        let session = this.getFromStorageSync(this.globalData.userInfoSessionKey);
+        let session = wx.getStorageSync(this.globalData.userInfoSessionKey);
         console.log(session)
         p.header = {sessionId: session.sessionId}
       }

@@ -15,6 +15,8 @@
   import Single from '../components/single/single'
   import zanDialog from '../components/dialog/zan-dialog'
   import UserInfoMixin from '../mixins/user-info'
+  import LoginUtil from '../util/login-util'
+  import Util from '../util/util'
 
   export default class Index extends wepy.page {
     config = {
@@ -47,7 +49,7 @@
     methods = {
     }
 
-    mixins= [UserInfoMixin]
+    // mixins= [UserInfoMixin]
 
     onPullDownRefresh() {
       console.log("xiala")
@@ -55,7 +57,9 @@
         wx.showToast({title:"帅哥美女库存已空，来推荐几个吧", icon: "none"})
         wx.stopPullDownRefresh();
       }else {
-        this.$parent.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, this.topLoadData.bind(this), false);
+        // this.$parent.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, this.topLoadData.bind(this), false);
+        Util.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, false, this.$parent)
+          .then(res => this.topLoadData(res))
       }
     }
 
@@ -64,7 +68,9 @@
       if (this.page.pageIndex > this.page.totalPage) {
         this.noData = true;
       }else {
-        this.$parent.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, this.downLoadData.bind(this), false);
+        // this.$parent.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, this.downLoadData.bind(this), false);
+        Util.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, false, this.$parent)
+          .then(res => this.downLoadData(res))
       }
     }
 
@@ -125,8 +131,35 @@
     }
 
     onLoad() {
-      console.log("注册用户授权事件")
-      this.$parent.globalData.eventBus.on("getuser", this.getUserSuccess.bind(this))
+      // this.$parent.globalData.eventBus.on("getuser", this.getUserSuccess.bind(this))
+      wx.showLoading({"title": "加载中...."})
+      LoginUtil.doLogin(this.$parent)
+        .then(res => {
+          if (res) {
+            return LoginUtil.getUserInfo(this)
+          }else {
+            console.log("登录异常")
+          }
+        })
+        .then(res => {
+          console.log("成功获得用户信息：", res)
+          wx.hideLoading()
+          return res;
+        })
+        .then(res => {
+          console.log("启动首个请求：", res)
+          return Util.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, true, this.$parent)
+        })
+        .then(res => {
+          console.log("成功获得信息:", res)
+          wx.hideLoading()
+          this.loadData(res)
+        })
+        .catch(error => {
+          console.log(error)
+          wx.hideLoading()
+          wx.showToast({"title": "系统异常，请稍后重试", "icon": "none"})
+        })
     }
   }
 </script>

@@ -80,6 +80,8 @@
 
 <script>
   import wepy from 'wepy'
+  import LoginUtil from '../util/login-util'
+  import Util from '../util/util'
   import simplepicker from '../components/picker/simplepicker'
   import datepicker from  '../components/picker/datepicker'
 
@@ -205,7 +207,7 @@
             if (!res) {
               wx.showToast({"title": "删除图片失败", "icon": "none"})
             }else {
-              this.userInfo.photos[index] = null;
+              this.userInfo.photos.splice(index,1);
               this.$apply()
             }
           },
@@ -223,8 +225,14 @@
             }else {
               console.log(res)
               let jsr = JSON.parse(res);
-              content.userInfo.photos[index] = jsr.info.md5;
-              content.$apply();
+              let md5 = jsr.info.md5;
+              let exist = content.userInfo.photos.findIndex(n => n===md5) !== -1;
+              if (exist) {
+                wx.showToast({"title": "不能上传相同图片,请换另外的靓照", "icon": "none"})
+              }else {
+                content.userInfo.photos[index] = jsr.info.md5;
+                content.$apply();
+              }
             }
           }
         )
@@ -233,45 +241,54 @@
         this.region = e.detail.value;
       },
       submitUserInfo() {
+        if (!this.checkInput()) {
+          return;
+        }
+        this.userInfo.photos = JSON.stringify(this.userInfo.photos)
         if (this.userSession.level == 'guest') {
           console.log("用户新提交信息")
-          this.userInfo.photos = JSON.stringify(this.userInfo.photos)
-          this.$parent.commonRequest(
-            this.$parent.globalData.backUrl + "user/saveUserInfo",
-            this.userInfo,
-            (res) => {
+          Util.commonRequest(this.$parent.globalData.backUrl + "user/saveUserInfo", this.userInfo, true, this.$parent)
+            .then(res => {
               if (res.success) {
-                wx.showToast({"title": "更新成功", "icon": "success"})
                 let setUserSession = {};
                 Object.assign(setUserSession, this.userSession);
                 setUserSession.level = 'user'
-                this.$parent.setToStorage(this.$parent.globalData.userInfoSessionKey, setUserSession);
+                wx.setStorageSync(this.$parent.globalData.userInfoSessionKey, setUserSession);
+                wx.setStorageSync(this.$parent.globalData.userInfoStorageKey, this.userInfo)
+                this.userInfo.photos = JSON.parse(this.userInfo.photos)
+                this.$apply();
               }else {
                 wx.showToast({"title": res.message, "icon": "none"})
               }
-            },true
-          )
+            })
         }else {
           console.log("用户更新信息")
+          Util.commonRequest(this.$parent.globalData.backUrl + "user/updateUserInfo", this.userInfo, true, this.$parent)
+            .then(res => {
+              if(res.success) {
+                wx.showToast({"title": "更新成功", "icon": "success"})
+                wx.setStorageSync(this.$parent.globalData.userInfoStorageKey, this.userInfo)
+                this.userInfo.photos = JSON.parse(this.userInfo.photos)
+                this.$apply();
+              }else {
+                wx.showToast({"title": res.message, "icon": "none"})
+              }
+            })
         }
       }
     }
 
     loadUserInfo() {
-      let userSession = this.$parent.getFromStorageSync(this.$parent.globalData.userInfoSessionKey)
-      let userInfo = this.$parent.getFromStorageSync(this.$parent.globalData.userInfoStorageKey);
-      this.userSession = userSession;
-      if (userSession['level'] == 'guest') {
-        console.log("游客身份", this)
-        this.processLocalUserInfo(userInfo)
-      }else{
-        console.log("用户身份")
-        if (null == userInfo['sex']) {
-          console.log("需要请求身份数据")
-        }else {
-          this.userInfo = userInfo
-        }
-      }
+      LoginUtil.getUserInfo(this)
+        .then(res => {
+          this.userSession = wx.getStorageSync(this.$parent.globalData.userInfoSessionKey)
+          if (res['sex'] == null) {
+           this.processLocalUserInfo(res)
+          }else {
+            res.photos = JSON.parse(res.photos)
+            this.userInfo = this.processUserInfo(res);
+          }
+        });
     }
 
     processLocalUserInfo(userInfo) {
@@ -283,7 +300,21 @@
     }
 
     processUserInfo(userInfo) {
+      this.sexArray.itemIndex = userInfo.sex;
+      return userInfo;
+    }
 
+    checkInput() {
+      if (this.userInfo.photos.length == 0) {
+        this.showErrorToast("请至少上传一张图片")
+        return false
+      }
+
+      return true;
+    }
+
+    showErrorToast(msg) {
+      wx.showToast({title:msg, icon:"none"})
     }
 
     onLoad() {

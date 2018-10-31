@@ -35,7 +35,7 @@
 <template>
   <view class="container" style="padding-top: 0">
     <div wx:if="{{show}}" style="width: 100%">
-      <view  class="user-info">
+      <view  class="user-info" @tap="goUserInfo">
         <image src="{{userInfo.avatarUrl}}"></image>
         <text>{{userInfo.nickName}}</text>
       </view>
@@ -52,6 +52,7 @@
 <script>
   import wepy from 'wepy'
   import menu from '../components/menu/menu'
+  import LoginUtil from '../util/login-util'
 
   export default class User extends wepy.page {
     config = {
@@ -79,28 +80,46 @@
     }
     methods = {
       getUserInfo(result) {
-        this.$parent.setToStorageSync(this.$parent.globalData.userInfoStorageKey, result.detail.userInfo)
+        wx.setStorageSync(this.$parent.globalData.userInfoStorageKey, result.detail.userInfo)
         this.userInfo.avatarUrl = result.detail.userInfo.avatarUrl;
         this.userInfo.nickName = result.detail.userInfo.nickName;
         this.show = true;
+      },
+      goUserInfo() {
+        wx.navigateTo({
+          url: "/pages/user_set_info"
+        })
       }
     }
 
     onShow() {
-      var _this = this;
-      // 检查缓存中是否存在
-      _this.$parent.getFromStorage(_this.$parent.globalData.userInfoStorageKey,(res) => {
-        if (res == null) {
-          console.log("用户页未授权开始执行授权处理")
-          _this.show = false;
-        }else {
-          console.log("用户页已有授权信息")
-          _this.userInfo.avatarUrl = res.avatarUrl;
-          _this.userInfo.nickName = res.nickName;
-          _this.show = true;
-        }
-        this.$apply();
-      });
+      // var _this = this;
+      // // 检查缓存中是否存在
+      // _this.$parent.getFromStorage(_this.$parent.globalData.userInfoStorageKey,(res) => {
+      //   if (res == null) {
+      //     console.log("用户页未授权开始执行授权处理")
+      //     _this.show = false;
+      //   }else {
+      //     console.log("用户页已有授权信息")
+      //     _this.userInfo.avatarUrl = res.avatarUrl;
+      //     _this.userInfo.nickName = res.nickName;
+      //     _this.show = true;
+      //   }
+      //   this.$apply();
+      // });
+
+      LoginUtil.getUserInfo(this,false)
+        .then(res => {
+          if (res == null || res == "") {
+            console.log("用户页未授权开始执行授权处理")
+            this.show = false;
+          }else {
+            console.log("用户页已有授权信息")
+            this.userInfo.avatarUrl = res.avatarUrl == null ? this.$parent.globalData.imageUrl + JSON.parse(res.photos)[0] : res.avatarUrl;
+            this.userInfo.nickName = res.nickName == null ? res.name: res.nickName;
+            this.show = true;
+          }
+        })
       // wx.getStorage({
       //   key: "userInfo",
       //   success(res) {
