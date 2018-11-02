@@ -27,16 +27,19 @@
 
 <script>
 import wepy from 'wepy'
+import 'wepy-async-function'
 import Interceptors from './interceptor/interceptors'
 import StorageUtil from './util/storage-util'
 import EventBus from './util/event-bus'
-import 'wepy-async-function'
+import CustomUtil from  './util/util'
+import CustomLoginUtil from  './util/login-util'
 
 
 export default class extends wepy.app {
   config = {
     pages: [
       'pages/index_test',
+      'pages/cropperpage',
       'pages/user_set_info',
       'pages/user_info',
       'pages/index',
@@ -86,9 +89,12 @@ export default class extends wepy.app {
   globalData = {
     userInfo: null,
     backUrl: 'http://192.168.137.1:8080/',
-    imageUrl: 'http://192.168.56.102:4869/',
+    imageUrl: 'http://www.shpcoder.cn:4869/',
     userInfoStorageKey: "userInfo",
     userInfoSessionKey: "sessionkey",
+    sexList: [
+      '男', '女'
+    ],
     constellationList: [
       "白羊座",
       "金牛座",
@@ -103,7 +109,7 @@ export default class extends wepy.app {
       "水瓶座",
       "双鱼座"
     ],
-    education:[
+    educationList:[
       "大专",
       "本科",
       "硕士",
@@ -124,12 +130,16 @@ export default class extends wepy.app {
     this.commonRequest= StorageUtil.commonRequest;
     this.commonUploadImg= StorageUtil.commonUploadImg;
     this.login = StorageUtil.login;
+    this.showCustomLoading = CustomUtil.showCustomLoading;
+    this.showErrorToast = CustomUtil.showErrorToast;
+    this.showSuccessToast = CustomUtil.showSuccessToast;
     this.intercept('login', Interceptors.login);
     this.intercept('request', Interceptors.request);
     this.intercept('uploadFile', Interceptors.uploadFile);
   }
 
   onLaunch() {
+    console.log("qidong")
     wx.setTabBarBadge({
       index: 2,
       text: ''

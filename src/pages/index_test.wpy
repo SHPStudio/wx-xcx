@@ -1,12 +1,17 @@
+<!--首页-->
 <style lang="less">
 </style>
 <template>
     <view class="container">
+        <!--列表-->
         <repeat for="{{dataList}}" index="index" item="item" key="key">
+          <!--列表单条记录-->
           <single :item="item"></single>
         </repeat>
         <block wx:if="{{noData}}">已经到底啦</block>
     </view>
+
+    <!--授权弹框-->
     <zanDialog/>
 </template>
 
@@ -14,7 +19,6 @@
   import wepy from 'wepy'
   import Single from '../components/single/single'
   import zanDialog from '../components/dialog/zan-dialog'
-  import UserInfoMixin from '../mixins/user-info'
   import LoginUtil from '../util/login-util'
   import Util from '../util/util'
 
@@ -49,39 +53,51 @@
     methods = {
     }
 
-    // mixins= [UserInfoMixin]
-
+    /**
+     * 下拉刷新触发方法
+     */
     onPullDownRefresh() {
-      console.log("xiala")
+      console.log("下拉刷新")
+
       if (this.page.pageIndex > this.page.totalPage) {
         wx.showToast({title:"帅哥美女库存已空，来推荐几个吧", icon: "none"})
         wx.stopPullDownRefresh();
       }else {
-        // this.$parent.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, this.topLoadData.bind(this), false);
         Util.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, false, this.$parent)
           .then(res => this.topLoadData(res))
       }
     }
 
+    /**
+     * 上拉刷新触发方法
+     */
     onReachBottom() {
-      console.log("处理")
+      console.log("上拉刷新")
       if (this.page.pageIndex > this.page.totalPage) {
         this.noData = true;
       }else {
-        // this.$parent.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, this.downLoadData.bind(this), false);
         Util.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, false, this.$parent)
           .then(res => this.downLoadData(res))
       }
     }
 
+    /**
+     * 处理请求过来的列表数据
+     * @param data 来自服务器的列表数据
+     */
     loadData(data) {
-      console.log(data)
+      console.log("请求到的数据：", data)
       this.dataList = this.processData(data.dataList);
       this.page.pageIndex += 1;
       this.page.totalPage = data.totalPage;
       this.$apply();
     }
 
+    /**
+     * 对列表数据进行可视化处理
+     * @param dataList
+     * @returns {*}
+     */
     processData(dataList) {
       let _this = this;
       let result = dataList.map(item => {
@@ -97,18 +113,29 @@
           path: `/pages/user_info?openId=${item.openId}`
         }
       })
-      console.log("处理的", result)
+      console.log("处理后数据", result)
       return result;
     }
 
+    /**
+     * 处理图片链接
+     * 因为服务器返回的图片集合是Json字符串 所以需要把字符串转换为数组 并且拼接好图片服务器地址
+     * @param photoListStr
+     * @returns {*}
+     */
     processImageUrl(photoListStr) {
       let imageUrl = this.$parent.globalData.imageUrl;
       let result = JSON.parse(photoListStr).map(item => `${imageUrl}${item}`)
       return result;
     }
 
+    /**
+     * 处理上拉刷新的请求数据
+     * 上拉刷新需要把数据放到列表的前面
+     * @param data
+     */
     topLoadData(data) {
-      console.log(data)
+      console.log("上拉刷新请求到的数据：", data);
       wx.stopPullDownRefresh();
       this.dataList.unshift(this.processData(data.dataList));
       this.page.pageIndex += 1;
@@ -116,23 +143,27 @@
       this.$apply();
     }
 
+    /**
+     * 处理下拉刷新的请求数据
+     * @param data
+     */
     downLoadData(data) {
-      console.log(data)
+      console.log("下拉刷新请求到的数据：", data);
       this.dataList.push(this.processData(data.dataList));
       this.page.pageIndex += 1;
       this.page.totalPage = data.totalPage;
       this.$apply();
     }
 
-    getUserSuccess() {
-      console.log("获得用户信息成功")
-      // 开始获取数据
-      this.$parent.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, this.loadData.bind(this), true);
-    }
-
     onLoad() {
-      // this.$parent.globalData.eventBus.on("getuser", this.getUserSuccess.bind(this))
-      wx.showLoading({"title": "加载中...."})
+      this.$parent.showCustomLoading("加载中...");
+
+      // 初始处理链
+      // 1.先登录获取三方登录态并保存到本地缓存中
+      // 2.登录后开始获取用户信息 其实主要是第一次获取用户信息授权用 然后保存到本地缓存
+      // 3.然后请求第一页数据
+      // 最后对上述处理中出现异常做异常处理 主要还是处理服务器连接失败问题
+
       LoginUtil.doLogin(this.$parent)
         .then(res => {
           if (res) {

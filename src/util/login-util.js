@@ -6,14 +6,14 @@ export default {
    * 执行登录计划
    * @returns {Promise<void>}
    */
-  async doLogin(that) {
-    console.log("进行登录", that);
-    let userSession = wx.getStorageSync(that.globalData.userInfoSessionKey)
+  async doLogin(thatParent) {
+    console.log("进行登录", thatParent);
+    let userSession = wx.getStorageSync(thatParent.globalData.userInfoSessionKey)
     console.log("session", userSession)
     if (null == userSession || userSession == "") {
       const code = await this.getCodeFromWx();
       console.log("获取code" + code);
-      const sessionValue = await this.getSessionIdFromServer(code, that)
+      const sessionValue = await this.getSessionIdFromServer(code, thatParent)
       console.log("获取sessionValue:", sessionValue)
     }else {
       console.log("已存在登录信息")
@@ -76,14 +76,14 @@ export default {
     })
   },
 
-  getSessionIdFromServer(code, that) {
+  getSessionIdFromServer(code, thatParent) {
     if (code == null)
       return null;
 
     return new Promise(resolve => {
-      console.log("调用getSessionIdFromServer", code, that)
+      console.log("调用getSessionIdFromServer", code, thatParent)
       wepy.request({
-        url: that.globalData.backUrl + "login/login",
+        url: thatParent.globalData.backUrl + "login/login",
         data: code,
         method: "POST",
         success(res) {
@@ -92,9 +92,9 @@ export default {
               let userInfo = res.data.userInfo;
               res.data.userInfo = null;
               let sessionValue = res.data;
-              wx.setStorageSync(that.globalData.userInfoSessionKey, sessionValue);
+              wx.setStorageSync(thatParent.globalData.userInfoSessionKey, sessionValue);
               if (null != userInfo) {
-                wx.setStorageSync(that.globalData.userInfoStorageKey, userInfo)
+                wx.setStorageSync(thatParent.globalData.userInfoStorageKey, userInfo)
               }
               resolve(res.data);
             } else {

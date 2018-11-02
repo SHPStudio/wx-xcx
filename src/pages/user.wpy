@@ -1,3 +1,4 @@
+<!--用户页-->
 <style lang="less">
   .user-info {
     height: 200rpx;
@@ -34,15 +35,21 @@
 </style>
 <template>
   <view class="container" style="padding-top: 0">
+    <!--用户页展示-->
     <div wx:if="{{show}}" style="width: 100%">
+      <!--头像条-->
       <view  class="user-info" @tap="goUserInfo">
         <image src="{{userInfo.avatarUrl}}"></image>
         <text>{{userInfo.nickName}}</text>
       </view>
+
+      <!--菜单-->
       <view class="menu">
           <menu :menulist="menuList"></menu>
       </view>
     </div>
+
+    <!--授权按钮-->
     <view wx:else style="margin-top: 50%;">
       <button size="mini" plain="true" open-type="getUserInfo" @getuserinfo="getUserInfo">登录</button>
     </view>
@@ -67,7 +74,8 @@
       show: false,
       userInfo: {
         avatarUrl: '',
-        nickName: ''
+        nickName: '',
+        status: null
       },
       menuList:{
         list:  [
@@ -79,12 +87,28 @@
       }
     }
     methods = {
+      /**
+       * 授权按钮触发方法
+       * 不过一般不会用到了 想的是第一次必须要授权
+       * @param result
+       */
       getUserInfo(result) {
+        if (!(result && result.detail)) {
+          console.log("授权失败:", result)
+          this.$parent.showErrorToast("授权失败");
+          return;
+        }
+
+        // 成功获取信息放到缓存中
         wx.setStorageSync(this.$parent.globalData.userInfoStorageKey, result.detail.userInfo)
         this.userInfo.avatarUrl = result.detail.userInfo.avatarUrl;
         this.userInfo.nickName = result.detail.userInfo.nickName;
         this.show = true;
       },
+
+      /**
+       * 点击头像条跳到编辑信息页面
+       */
       goUserInfo() {
         wx.navigateTo({
           url: "/pages/user_set_info"
@@ -93,45 +117,24 @@
     }
 
     onShow() {
-      // var _this = this;
-      // // 检查缓存中是否存在
-      // _this.$parent.getFromStorage(_this.$parent.globalData.userInfoStorageKey,(res) => {
-      //   if (res == null) {
-      //     console.log("用户页未授权开始执行授权处理")
-      //     _this.show = false;
-      //   }else {
-      //     console.log("用户页已有授权信息")
-      //     _this.userInfo.avatarUrl = res.avatarUrl;
-      //     _this.userInfo.nickName = res.nickName;
-      //     _this.show = true;
-      //   }
-      //   this.$apply();
-      // });
+      this.$parent.showCustomLoading("加载中...");
+      // 为了更新用户信息的审核状态 一到用户页就删除本地缓存 重新获取
+      wx.removeStorageSync(this.$parent.globalData.userInfoStorageKey);
 
       LoginUtil.getUserInfo(this,false)
         .then(res => {
-          if (res == null || res == "") {
+          wx.hideLoading();
+          if (res == null || res === "") {
             console.log("用户页未授权开始执行授权处理")
             this.show = false;
           }else {
-            console.log("用户页已有授权信息")
+            console.log("用户页已有授权信息", res)
             this.userInfo.avatarUrl = res.avatarUrl == null ? this.$parent.globalData.imageUrl + JSON.parse(res.photos)[0] : res.avatarUrl;
             this.userInfo.nickName = res.nickName == null ? res.name: res.nickName;
             this.show = true;
           }
+          this.$apply();
         })
-      // wx.getStorage({
-      //   key: "userInfo",
-      //   success(res) {
-      //     console.log("已有授权信息" + JSON.stringify(res))
-      //     _this.userInfo.avatarUrl = res.data.avatarUrl;
-      //     _this.userInfo.nickName = res.data.nickName;
-      //     _this.show = true;
-      //   },
-      //   fail(res) {
-      //     _this.show = false;
-      //   }
-      // })
     }
   }
 </script>

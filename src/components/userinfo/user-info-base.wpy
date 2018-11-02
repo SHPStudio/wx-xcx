@@ -27,7 +27,7 @@
   export default class extends wepy.component {
     props = {
       icon: String,
-      text: String
+      text: {type: String,default: "", twoWay: true}
     }
     data = {
     }

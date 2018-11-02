@@ -1,0 +1,101 @@
+<template>
+  <view class="mess {{showModal ? 'open-display' : 'close-display'}}">
+    <view class="cropper-buttons">
+      <cropper :options="cropperOpt"></cropper>
+      <view
+        class="upload"
+        @tap="closeCropperPage()">
+        取消
+      </view>
+      <view
+        class="getCropperImage"
+        @tap="getCropperImage">
+        完成
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import Cropper from './cropper'
+  const device = wx.getSystemInfoSync()
+  const width = device.windowWidth
+  const height = device.windowHeight
+
+  export default class extends wepy.component {
+    props = {
+      showModal: {type: Boolean, default: null,twoWay: true}
+    }
+
+    data = {
+      cropperOpt: {
+        width,
+        height,
+        scale: 2.5,
+        zoom: 8,
+        cut: {
+          x: 0,
+          y: (height - width) / 2,
+          width: width,
+          height: width
+        }
+      },
+      show: false,
+      parent: {},
+      index: null
+    }
+
+    methods = {
+      closeCropperPage() {
+        // this.show = false;
+        this.$emit("loadImg", null, this.index)
+      },
+      getCropperImage () {
+        this.$invoke('cropper', 'getCropperImage', {quality: 5}, (src) => {
+          if (src) {
+            console.log(src)
+            // this.show = false;
+            this.$apply();
+            this.$emit("loadImg", src, this.index)
+          } else {
+            console.log('获取图片地址失败，请稍后重试')
+          }
+        })
+      }
+    }
+
+    showCropperPage(src, index) {
+      this.$invoke('cropper', 'pushOrigin', src);
+      this.show = true;
+      this.index = index;
+      this.$apply();
+    }
+    components = {
+      cropper: Cropper
+    }
+  }
+</script>
+
+<style lang="less">
+  .mess {
+    position: absolute;
+    top:0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    flex-direction: row;
+    z-index: 1000;
+
+    cropper {
+      display: block;
+      width: 100%;
+    }
+  }
+  .open-display {
+    display: flex;
+  }
+  .close-display {
+    display: none;
+  }
+</style>

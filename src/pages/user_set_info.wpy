@@ -1,5 +1,13 @@
+<!--用户信息编辑页面-->
 <template>
-    <scroll-view class="container user-set-info" scroll-y="true">
+    <scroll-view class="container user-set-info" scroll-y="true" style="{{choosingPhoto == true ? 'display: none' : 'display:flex'}}">
+      <!--审核状态-->
+      <view class="top-info {{userInfo.status === 0 ? 'top-info-warn' : 'top-info-error'}}" wx:if="{{userInfo.status !== 1 }}">
+        <text wx:if="{{userInfo.status === 0}}">审核中，请等待审核</text>
+        <text wx:if="{{userInfo.status === 2}}">被驳回，{{userInfo.rejectReason}}</text>
+      </view>
+
+      <!--个人图片-->
       <view class="title">请至少上传一张个人照片</view>
       <view class="content user-photo">
         <view class="photo big-photo">
@@ -14,15 +22,17 @@
             <icon wx:if="{{userInfo.photos[1] != null}}" type="cancel" color="white" size="30" @tap="deletePhoto(1)"></icon>
           </view>
           <view class="photo small-photo" style="margin-top: 0" >
-            <image src="{{imageUrl + userInfo.photos[2]}}" wx:if="{{photos[2] != null}}"></image>
+            <image src="{{imageUrl + userInfo.photos[2]}}" wx:if="{{userInfo.photos[2] != null}}"></image>
             <text wx:else @tap="choosePhoto(2)">+</text>
             <icon wx:if="{{userInfo.photos[2] != null}}" type="cancel" color="white" size="30" @tap="deletePhoto(2)"></icon>
           </view>
         </view>
       </view>
+
+      <!--用户基本信息-->
       <view class="title">基本信息</view>
       <view class="content base-info">
-        <view class="text-input"><text>昵称</text><view class="fill-content"></view><input value="{{userInfo.name}}" placeholder="请输入昵称" autofocus/></view>
+        <view class="text-input"><text>昵称</text><view class="fill-content"></view><input value="{{userInfo.name}}" bindinput="bindInputValue('name')" placeholder="请输入昵称" /></view>
         <view class="line" style="margin-top: 15rpx;"></view>
         <view class="pick-input" style="margin-top: 15rpx;"><text>性别</text><view class="fill-content"></view>
           <sexpicker :items.sync="sexArray" ></sexpicker>
@@ -43,16 +53,15 @@
         <view class="pick-input" style="margin-top: 15rpx;"><text>籍贯</text><view class="fill-content"></view>
           <picker mode="region" bindchange="bindCity" value="{{region}}">
             <view class="picker">
-              {{region[0]}} {{region[1]}}
+              <text wx:if="{{region[0] != null && region[0] !==''}}">{{region[0]}} {{region[1]}}</text>
+              <text wx:else>请点击选择地区</text>
             </view>
           </picker>
         </view>
         <view class="line" style="margin-top: 15rpx;"></view>
-        <view class="pick-input" style="margin-top: 15rpx;"><text>工作地址</text><view class="fill-content"></view>
-          <input value="{{userInfo.workArea}}" placeholder="请点击输入" autofocus/>
-        </view>
+        <view class="text-input" style="margin-top: 15rpx;"><text>工作地址</text><view class="fill-content"></view><input value="{{userInfo.workArea}}" bindinput="bindInputValue('workArea')" placeholder="请点击输入"/></view>
         <view class="line" style="margin-top: 15rpx;"></view>
-        <view class="text-input" style="margin-top: 15rpx;"><text>所在部门</text><view class="fill-content"></view><input value="{{userInfo.department}}" placeholder="请输入部门(xxx-xxx)"/></view>
+        <view class="text-input" style="margin-top: 15rpx;"><text>所在部门</text><view class="fill-content"></view><input value="{{userInfo.department}}" bindinput="bindInputValue('department')" placeholder="请输入部门(xxx-xxx)"/></view>
         <view class="line" style="margin-top: 15rpx;"></view>
         <view class="pick-input" style="margin-top: 15rpx;"><text>身高(cm)</text><view class="fill-content"></view>
           <tallpicker :items.sync="tallArray"></tallpicker>
@@ -62,20 +71,27 @@
           <fatpicker :items.sync="fatArray"></fatpicker>
         </view>
       </view>
+
+      <!--其他的信息-->
       <view class="title">其他信息</view>
       <view class="content base-info">
-        <view class="text-input"><text>自我评价性格</text><view class="fill-content"></view><input value="{{userInfo.selfEvaluation}}" placeholder="请点击输入" autofocus/></view>
+        <view class="text-input"><text>自我评价性格</text><view class="fill-content"></view><input value="{{userInfo.selfEvaluation}}" bindinput="bindInputValue('selfEvaluation')" placeholder="请点击输入" autofocus/></view>
         <view class="line" style="margin-top: 15rpx;"></view>
-        <view class="text-input" style="margin-top: 15rpx;"><text>最想说的话</text><view class="fill-content"></view><input value="{{userInfo.wantSay}}" placeholder="请点击输入"/></view>
+        <view class="text-input" style="margin-top: 15rpx;"><text>最想说的话</text><view class="fill-content"></view><input value="{{userInfo.wantSay}}" bindinput="bindInputValue('wantSay')"  placeholder="请点击输入"/></view>
         <view class="line" style="margin-top: 15rpx;"></view>
-        <view class="text-input" style="margin-top: 15rpx;"><text>家庭状况</text><view class="fill-content"></view><input value="{{userInfo.family}}" placeholder="请点击输入"/></view>
+        <view class="text-input" style="margin-top: 15rpx;"><text>家庭状况</text><view class="fill-content"></view><input value="{{userInfo.family}}" bindinput="bindInputValue('family')" placeholder="请点击输入"/></view>
         <view class="line" style="margin-top: 15rpx;"></view>
-        <view class="text-input" style="margin-top: 15rpx;"><text>交友标准(详细写)</text><view class="fill-content"></view><input value="{{userInfo.standFriend}}" placeholder="请点击输入"/></view>
+        <view class="text-input" style="margin-top: 15rpx;"><text>交友标准(详细写)</text><view class="fill-content"></view><input value="{{userInfo.standFriend}}" bindinput="bindInputValue('standFriend')" placeholder="请点击输入"/></view>
       </view>
+
+      <!--保存信息-->
       <view class="footer">
         <button type="primary" @tap="submitUserInfo">保存</button>
       </view>
     </scroll-view>
+
+    <!--图片裁剪-->
+    <cropperpage :showModal.sync="choosingPhoto" @loadImg.user="loadingImg"></cropperpage>
 </template>
 
 <script>
@@ -84,6 +100,7 @@
   import Util from '../util/util'
   import simplepicker from '../components/picker/simplepicker'
   import datepicker from  '../components/picker/datepicker'
+  import cropperpage from '../components/wepy-cropper/cropperpage'
 
   export default class extends wepy.page {
     config = {
@@ -96,13 +113,15 @@
       educatepicker: simplepicker,
       tallpicker: simplepicker,
       fatpicker: simplepicker,
-      datepicker
+      datepicker,
+      cropperpage
     }
 
     data= {
       region:['黑龙江省', '大庆市'],
       imageUrl: '',
       userSession: {},
+      choosingPhoto: false,
       tallArray: {
         items: Array.apply(null, {length: 60}).map(function(value, index){
           return index + 150;
@@ -116,16 +135,11 @@
         itemIndex: null
       },
       sexArray: {
-        items: ['男', '女'],
+        items: [],
         itemIndex: null
       },
       educateArray: {
-        items: [
-          "大专",
-          "本科",
-          "硕士",
-          "博士"
-        ],
+        items: [],
         itemIndex: null
       },
       birthdayDate: {
@@ -139,7 +153,7 @@
         city: null,
         constellation: null,
         birthday: null,
-        status: 0,
+        status: 1,
         rejectReason: null,
         department: null,
         yn: 0,
@@ -155,20 +169,7 @@
         wxNumber: null
       },
       constellationArray: {
-        items: [
-          "白羊座",
-          "金牛座",
-          "双子座",
-          "巨蟹座",
-          "狮子座",
-          "处女座",
-          "天秤座",
-          "天蝎座",
-          "射手座",
-          "魔蝎座",
-          "水瓶座",
-          "双鱼座"
-        ],
+        items: [],
         itemIndex: null
       }
     }
@@ -176,78 +177,113 @@
 
 
     methods = {
+      /**
+       * 接收处理好的裁剪图片
+       * @param src 临时图片地址
+       * @param index 处理的图片索引
+       */
+      loadingImg(src, index) {
+        console.log("接收到的裁剪图片信息",src,index)
+        if (src == null) {
+          this.choosingPhoto = false;
+          return;
+        }
+        this.methods.uploadImg(src, index, this)
+      },
+
+      /**
+       * 选择图片
+       * 默认只能选择压缩的因为图片服务器性能有限
+       * @param index
+       */
       choosePhoto(index) {
         let _this =this;
-        console.log(index)
+        console.log("选择的图片索引", index);
+
         wx.chooseImage({
           count:1,
+          sizeType: ['compressed'],
           success(res) {
-            console.log(res)
             let file = res.tempFilePaths;
-            console.log(file)
             if (null == file) {
-              wx.showToast({title:"选择图片异常", icon:"none"})
+              console.log("选择图片异常:", res);
+              _this.$parent.showErrorToast("选择图片异常，请稍后重试");
             }else {
-              // _this.uploadImg(file[0].path)
-              _this.methods.uploadImg(file[0], index, _this)
+              _this.choosingPhoto = true;
+              _this.$invoke('cropperpage', 'showCropperPage', file[0] , index)
             }
-            console.log(_this.photos)
             _this.$apply();
           }
         })
       },
+
+      /**
+       * 删除图片
+       * fixed: 目前没有删除服务器图片资源 现在存在资源问题
+       * @param index
+       */
       deletePhoto(index){
-        let md5 = this.userInfo.photos[index];
-        console.log("删除", md5)
-        this.$parent.commonRequest(
-          this.$parent.globalData.backUrl + "user/deleteImg/" + md5,
-          null,
-          (res) => {
-            console.log(res)
-            if (!res) {
-              wx.showToast({"title": "删除图片失败", "icon": "none"})
-            }else {
-              this.userInfo.photos.splice(index,1);
-              this.$apply()
-            }
-          },
-          true
-        )
+        this.userInfo.photos.splice(index,1);
+        this.$apply()
       },
+
+      /**
+       * 上传图片
+       * @param file 要上传图片的文件临时路径
+       * @param index 上传图片索引
+       * @param content 当前页面引用
+       */
       uploadImg(file, index, content) {
-        console.log(content)
-        content.$parent.commonUploadImg(
-          content.$parent.globalData.backUrl + "user/uploadImg",
-          file,
-          (res) => {
+        console.log()
+        Util.commonUploadImg(content.$parent.globalData.backUrl + "user/uploadImg",
+          file, content)
+          .then(res => {
+            console.log(res)
             if (res == null) {
-              wx.showToast({"title": "上传异常！", "icon": "none"})
+              content.$parent.showErrorToast("上传异常！")
             }else {
-              console.log(res)
               let jsr = JSON.parse(res);
               let md5 = jsr.info.md5;
               let exist = content.userInfo.photos.findIndex(n => n===md5) !== -1;
               if (exist) {
-                wx.showToast({"title": "不能上传相同图片,请换另外的靓照", "icon": "none"})
+                content.$parent.showErrorToast("不能上传相同图片,请换另外的靓照");
               }else {
                 content.userInfo.photos[index] = jsr.info.md5;
-                content.$apply();
               }
             }
-          }
-        )
+            content.choosingPhoto = false;
+            content.$apply();
+          })
       },
+
+      /**
+       * 选择地区回调
+       * @param e
+       */
       bindCity(e) {
         this.region = e.detail.value;
       },
+
+      /**
+       * 提交用户信息
+       */
       submitUserInfo() {
+
+        // 1. 校验
         if (!this.checkInput()) {
           return;
         }
-        this.userInfo.photos = JSON.stringify(this.userInfo.photos)
+
+        // 2. 处理填写信息
+        this.processSubmitUserInfo();
+
+
+        let submitInfo = {};
+        Object.assign(submitInfo, this.userInfo)
+        submitInfo.photos = JSON.stringify(this.userInfo.photos)
         if (this.userSession.level == 'guest') {
           console.log("用户新提交信息")
-          Util.commonRequest(this.$parent.globalData.backUrl + "user/saveUserInfo", this.userInfo, true, this.$parent)
+          Util.commonRequest(this.$parent.globalData.backUrl + "user/saveUserInfo", submitInfo, true, this.$parent)
             .then(res => {
               if (res.success) {
                 let setUserSession = {};
@@ -255,30 +291,52 @@
                 setUserSession.level = 'user'
                 wx.setStorageSync(this.$parent.globalData.userInfoSessionKey, setUserSession);
                 wx.setStorageSync(this.$parent.globalData.userInfoStorageKey, this.userInfo)
-                this.userInfo.photos = JSON.parse(this.userInfo.photos)
+                this.userInfo.status = 0;
                 this.$apply();
               }else {
-                wx.showToast({"title": res.message, "icon": "none"})
+                this.$parent.showErrorToast(res.message);
               }
+              wx.pageScrollTo({
+                scrollTop: 0,
+                duration: 300
+              })
             })
         }else {
           console.log("用户更新信息")
-          Util.commonRequest(this.$parent.globalData.backUrl + "user/updateUserInfo", this.userInfo, true, this.$parent)
+          Util.commonRequest(this.$parent.globalData.backUrl + "user/updateUserInfo", submitInfo, true, this.$parent)
             .then(res => {
               if(res.success) {
-                wx.showToast({"title": "更新成功", "icon": "success"})
-                wx.setStorageSync(this.$parent.globalData.userInfoStorageKey, this.userInfo)
-                this.userInfo.photos = JSON.parse(this.userInfo.photos)
+               this.$parent.showSuccessToast("更新成功");
+                wx.setStorageSync(this.$parent.globalData.userInfoStorageKey, this.userInfo);
+                // this.userInfo.status = 0;
                 this.$apply();
               }else {
-                wx.showToast({"title": res.message, "icon": "none"})
+                this.$parent.showErrorToast(res.message);
               }
+              wx.pageScrollTo({
+                scrollTop: 0,
+                duration: 300
+              })
             })
         }
+
+      },
+      /**
+       * 通用绑定input值
+       * @param props
+       * @param value
+       */
+      bindInputValue(props, value) {
+        this.userInfo[props] = value.detail.value;
       }
     }
 
+    /**
+     * 加载用户信息
+     */
     loadUserInfo() {
+
+      this.$parent.showCustomLoading("加载中...");
       LoginUtil.getUserInfo(this)
         .then(res => {
           this.userSession = wx.getStorageSync(this.$parent.globalData.userInfoSessionKey)
@@ -288,9 +346,14 @@
             res.photos = JSON.parse(res.photos)
             this.userInfo = this.processUserInfo(res);
           }
+          wx.hideLoading();
         });
     }
 
+    /**
+     * 处理游客级别用户信息
+     * @param userInfo
+     */
     processLocalUserInfo(userInfo) {
       console.log(userInfo)
       this.userInfo.name = userInfo.nickName;
@@ -299,11 +362,29 @@
       this.sexArray.itemIndex = this.userInfo.sex;
     }
 
+    /**
+     * 处理数据库真正用户信息
+     * @param userInfo
+     * @returns {*}
+     */
     processUserInfo(userInfo) {
       this.sexArray.itemIndex = userInfo.sex;
+      this.birthdayDate.date = userInfo.birthday;
+      this.constellationArray.itemIndex = userInfo.constellation;
+      this.educateArray.itemIndex = userInfo.education;
+      this.region[0] = userInfo.province;
+      this.region[1] = userInfo.city;
+      this.tallArray.itemIndex = userInfo.height == null || userInfo.height === 0 ? null
+        : this.tallArray.items.findIndex(n => n === userInfo.height);
+      this.fatArray.itemIndex = userInfo.weight == null || userInfo.height === 0 ? null
+        : this.fatArray.items.findIndex(n => n === userInfo.weight);
       return userInfo;
     }
 
+    /**
+     * 提交校验
+     * @returns {boolean}
+     */
     checkInput() {
       if (this.userInfo.photos.length == 0) {
         this.showErrorToast("请至少上传一张图片")
@@ -313,12 +394,25 @@
       return true;
     }
 
-    showErrorToast(msg) {
-      wx.showToast({title:msg, icon:"none"})
+    /**
+     * 处理提交用户信息
+     */
+    processSubmitUserInfo() {
+      this.userInfo.sex = this.sexArray.itemIndex;
+      this.userInfo.birthday = this.birthdayDate.date;
+      this.userInfo.constellation = this.constellationArray.itemIndex;
+      this.userInfo.education = this.educateArray.itemIndex;
+      this.userInfo.province = this.region[0];
+      this.userInfo.city = this.region[1];
+      this.userInfo.height = this.tallArray.items[this.tallArray.itemIndex];
+      this.userInfo.weight = this.fatArray.items[this.fatArray.itemIndex];
     }
 
     onLoad() {
       this.imageUrl = this.$parent.globalData.imageUrl;
+      this.sexArray.items = this.$parent.globalData.sexList;
+      this.constellationArray.items = this.$parent.globalData.constellationList;
+      this.educateArray.items = this.$parent.globalData.educationList;
       this.loadUserInfo()
     }
   };
@@ -327,6 +421,20 @@
 <style lang="less">
   .user-set-info {
     padding-top: 0;
+
+    .top-info {
+      color: whitesmoke;
+      font-size: 25rpx;
+      padding: 10rpx;
+    }
+
+    .top-info-warn {
+      background: #FF9900;
+    }
+
+    .top-info-error {
+      background: #CC3333;
+    }
 
     .title {
       font-size: 25rpx;
@@ -431,9 +539,10 @@
       }
       .small-photo {
         margin: 50rpx;
-        width: 200rpx;
-        height: 175rpx;
+        width: 190rpx;
+        height: 190rpx;
         margin-left: 0;
+        margin-bottom: 21rpx;
 
         text{
           line-height: 175rpx;

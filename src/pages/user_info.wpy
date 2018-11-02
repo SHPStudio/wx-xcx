@@ -1,35 +1,44 @@
+<!--用户信息展示详情页-->
 <template>
     <view class="container user-info">
-      <view class="user-image">
-        <swiper indicator-dots="true" duration="200">
-          <block wx:for="{{userInfo.photos}}" wx:for-index="index">
+      <!--用户照片-->
+      <view class="user-image" style="width: {{width}}px; height: {{width}}px;">
+        <swiper indicator-dots="true" duration="200" style="width: {{width}}px; height: {{width}}px;">
+          <block wx:for="{{userInfo.photoList}}" wx:for-index="index" wx:key="index">
             <swiper-item>
-              <image mode="widthFix" src="{{item}}" class="slide-image" @tap="lookImage({{index}})"/>
+              <image src="{{imageUrl + item}}" class="slide-image" style="width: {{width}}px; height: {{width}}px;" @tap="lookImage({{index}})"/>
             </swiper-item>
           </block>
         </swiper>
       </view>
       <view class="user-info-content">
+        <!--昵称与 关注和查看微信号 以后可能会有举报功能-->
         <view class="user-info-name">
           <text style="font-size: 40rpx">{{userInfo.name}}</text>
           <view class="fill-content"></view>
           <image @tap="wxNumClick" class="wx" src="/image/usericon/wx.png" wx:if="{{userInfo.allAttention && userInfo.attention}}"></image>
           <image @tap="attentionClick" class="xin" src="{{userInfo.attention ? '/image/usericon/xinfill.png' : '/image/usericon/xin.png'}}"></image>
         </view>
+
+        <!--性别信息-->
         <view class="user-sex">
-          <sexinfo :sex.sync="sexCom" :text="ageCom"></sexinfo>
+          <sexinfo :sex.sync="sexCom" :text.sync="ageCom"></sexinfo>
         </view>
+
+        <!--用户基本信息-->
         <view class="user-info-base">
-          <positionInfo icon="/image/usericon/position.png" :text="jiguanCom"></positionInfo>
-          <educationInfo icon="/image/usericon/jiaoyu.png" text="本科"></educationInfo>
-          <tallInfo icon="/image/usericon/tall.png" text="176cm 56kg"></tallInfo>
-          <workInfo icon="/image/usericon/work.png" text="北京北辰 商家研发部-商家运营部"></workInfo>
+          <positionInfo icon="/image/usericon/position.png" :text.sync="jiguanCom"></positionInfo>
+          <educationInfo icon="/image/usericon/jiaoyu.png" :text.sync="educationCom"></educationInfo>
+          <tallInfo icon="/image/usericon/tall.png" :text.sync="tallCom"></tallInfo>
+          <workInfo icon="/image/usericon/work.png" :text.sync="departmentCom"></workInfo>
         </view>
+
+        <!--用户其他信息-->
         <view class="user-info-ext">
-            <selfEvulateExtInfo title="自我评价" text="sfasgadsgwqektjlejs lakjs flkajsd lkfajs dlksajdlkfjdas lkajs lkfaj dslkfasj dlkajds lksaj dlk jdsalkja slkd jalkd sj"></selfEvulateExtInfo>
-            <wantSayExtInfo title="最想说的" text="sfasgadsgwqektjlejs lakjs flkajsd lkfajs dlksajdlkfjdas lkajs lkfaj dslkfasj dlkajds lksaj dlk jdsalkja slkd jalkd sj"></wantSayExtInfo>
-            <homeStatusExtInfo title="家庭情况" text="家庭和睦"></homeStatusExtInfo>
-            <friendStandardExtInfo title="交友标准" text="撒旦格林卡将是大概率卡时间道格拉斯大噶啥啊"></friendStandardExtInfo>
+            <selfEvulateExtInfo title="自我评价" :text.sync="selfEvaluationCom"></selfEvulateExtInfo>
+            <wantSayExtInfo title="最想说的" :text.sync="wantSayCom"></wantSayExtInfo>
+            <homeStatusExtInfo title="家庭情况" :text.sync="familyCom"></homeStatusExtInfo>
+            <friendStandardExtInfo title="交友标准" :text.sync="standFriendCom"></friendStandardExtInfo>
         </view>
       </view>
     </view>
@@ -40,6 +49,10 @@
   import SexInfo from '../components/userinfo/sex-info'
   import BaseInfo from '../components/userinfo/user-info-base'
   import ExtInfo  from '../components/userinfo/user-info-ext'
+  import Util from '../util/util'
+  const device = wx.getSystemInfoSync()
+  const width = device.windowWidth
+
 
   export default class UserInfo extends wepy.page {
     config = {
@@ -58,40 +71,70 @@
       friendStandardExtInfo: ExtInfo
     }
     data = {
-      userInfo: {
-        photos: [
-          "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1539685435407&di=bfe1e6f638e0815a2dd51edd602abcce&imgtype=0&src=http%3A%2F%2Fimg.mp.sohu.com%2Fupload%2F20170801%2F8afb51cbe5d34ef5bbda27a2a6deaca5_th.png",
-          "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1539685435406&di=d19688223f917c17475b5f756b134d77&imgtype=0&src=http%3A%2F%2Fimg.mp.sohu.com%2Fupload%2F20170801%2F8124b872c187480c877a3ef0633f3fb3_th.png"
-        ],
-        attention: true,
-        name: "举个果子。",
-        sex: 1,
-        age: "96年天蝎座",
-        allAttention: false,
-        jiguan: "山东省 烟台市"
-      }
+      userInfo: { birthday: "1999-01-20"},
+      width: width,
+      openId:"",
+      imageUrl:""
     }
     computed = {
       sexCom() {
         return this.userInfo.sex;
       },
       ageCom() {
-        return this.userInfo.age;
+        return this.userInfo.birthday.substring(2, 4) + "年" + this.userInfo.constellationStr;
       },
       jiguanCom() {
-        return this.userInfo.jiguan;
+        return this.userInfo.province + " " + this.userInfo.city;
+      },
+      educationCom() {
+        return this.userInfo.educationStr;
+      },
+      tallCom() {
+        let result = '';
+        if (this.userInfo.height != null && this.userInfo.height !== 0) {
+          result += this.userInfo.height + "cm "
+        }
+        if (this.userInfo.weight != null && this.userInfo.weight !== 0) {
+          result += this.userInfo.weight + "kg"
+        }
+        return result;
+      },
+      departmentCom() {
+        return this.userInfo.department;
+      },
+      selfEvaluationCom() {
+        return this.processNullStr(this.userInfo.selfEvaluation);
+      },
+      wantSayCom() {
+        return this.processNullStr(this.userInfo.wantSay);
+      },
+      standFriendCom() {
+        return this.processNullStr(this.userInfo.standFriend);
+      },
+      familyCom() {
+        return this.processNullStr(this.userInfo.family);
+      }
+    }
+
+    processNullStr(str) {
+      if (str == null || str == "") {
+        return "暂时没什么想说的"
+      }else {
+        return str;
       }
     }
 
     methods = {
       lookImage(index) {
+        let currentImage =  this.imageUrl + this.userInfo.photoList[index];
+        let imageList = this.userInfo.photoList.map(x => this.imageUrl + x)
         wx.previewImage({
-          urls: this.userInfo.photos,
-          current: this.userInfo.photos[index],
+          urls: imageList,
+          current: currentImage,
           success(res) {
             console.log(res)
           }
-        }).bind(this);
+        });
       },
       attentionClick() {
         this.userInfo.attention = !this.userInfo.attention;
@@ -110,24 +153,34 @@
         wx.showModal({title: "微信号",content: "xshwpssdfa", showCancel: false})
       }
     }
-    onShow() {
+    onLoad() {
       console.log(this.$wxpage.options.openId)
+      this.openId = this.$wxpage.options.openId;
+      this.imageUrl = this.$parent.globalData.imageUrl;
+      Util.commonRequest(
+        this.$parent.globalData.backUrl + "user/getOtherUserInfo",
+        this.openId,
+        true,
+        this.$parent
+      ).then(res => {
+        console.log(res)
+        wx.hideLoading();
+        if(res.success) {
+          this.userInfo = res.data;
+          this.$apply();
+        }else {
+          this.$parent.showErrorToast(res.message);
+        }
+      }).catch(error => {
+        wx.hideLoading();
+        console.log("发生异常：", error);
+        this.$parent.showErrorToast("系统异常，请稍后重试");
+      })
     }
   };
 </script>
 
 <style lang="less">
-  .user-image{
-    width: 100%;
-    height: 450rpx;
-  }
-  .user-image swiper{
-    height: 450rpx;
-  }
-  .slide-image {
-    width: 100%;
-    height: 450rpx;
-  }
   .user-info {
     padding-top: 0;
   }

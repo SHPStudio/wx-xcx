@@ -8,9 +8,14 @@
     text-align: center;
     padding: 10rpx;
 
+    .ellis {
+      overflow: hidden;
+      text-overflow:ellipsis;
+      white-space: nowrap;
+    }
+
     image {
       width: 95%;
-      height: 350rpx;
       border-radius: 10rpx;
     }
 
@@ -55,28 +60,30 @@
 </style>
 <template>
   <view class="single" @tap="goTo">
-    <image mode="top"  src="{{item.photos[0]}}"></image>
+    <image style="width: {{width-50}}px; height: {{width-50}}px"  src="{{item.photos[0]}}"></image>
     <panel class="info">
       <text>{{item.name}}</text>
       <view class="info-text">
         <image src="{{item.sex == 0 ? boyUrl:girlUrl}}"></image>
-        <text class="address">{{item.jiguan}}</text>
+        <text class="address ellis" style="max-width:230rpx;">{{item.jiguan}}</text>
         <text class="age">{{item.birthday}}年{{item.constellation}}</text>
-        <text class="depart">{{item.department}}</text>
+        <text class="depart ellis" style="max-width:230rpx;">{{item.department}}</text>
       </view>
     </panel>
   </view>
 </template>
 <script>
   import wepy from 'wepy'
-
+  const device = wx.getSystemInfoSync()
+  const width = device.windowWidth
   export default class Single extends wepy.component {
     props = {
       item: {}
     }
     data = {
       boyUrl: '/image/sex/man.png',
-      girlUrl: '/image/sex/woman.png'
+      girlUrl: '/image/sex/woman.png',
+      width: width
     }
     methods = {
       goTo() {
