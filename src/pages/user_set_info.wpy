@@ -286,12 +286,13 @@
           Util.commonRequest(this.$parent.globalData.backUrl + "user/saveUserInfo", submitInfo, true, this.$parent)
             .then(res => {
               if (res.success) {
+                this.$parent.showSuccessToast("提交成功");
                 let setUserSession = {};
                 Object.assign(setUserSession, this.userSession);
-                setUserSession.level = 'user'
+                setUserSession.level = 'user';
+                this.userInfo.status = 0;
                 wx.setStorageSync(this.$parent.globalData.userInfoSessionKey, setUserSession);
                 wx.setStorageSync(this.$parent.globalData.userInfoStorageKey, this.userInfo)
-                this.userInfo.status = 0;
                 this.$apply();
               }else {
                 this.$parent.showErrorToast(res.message);
@@ -387,7 +388,7 @@
      */
     checkInput() {
       if (this.userInfo.photos.length == 0) {
-        this.showErrorToast("请至少上传一张图片")
+        this.$parent.showErrorToast("请至少上传一张图片");
         return false
       }
 

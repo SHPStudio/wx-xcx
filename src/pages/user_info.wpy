@@ -74,7 +74,8 @@
       userInfo: { birthday: "1999-01-20"},
       width: width,
       openId:"",
-      imageUrl:""
+      imageUrl:"",
+      wxNumber:""
     }
     computed = {
       sexCom() {
@@ -100,7 +101,7 @@
         return result;
       },
       departmentCom() {
-        return this.userInfo.department;
+        return this.userInfo.workArea + " " + this.userInfo.department;
       },
       selfEvaluationCom() {
         return this.processNullStr(this.userInfo.selfEvaluation);
@@ -137,20 +138,73 @@
         });
       },
       attentionClick() {
-        this.userInfo.attention = !this.userInfo.attention;
-        if (this.userInfo.attention) {
-          let message = "关注成功";
-          if (this.userInfo.allAttention) {
-            message = "您与他/她已经互相关注，可查看对方微信号哦";
-          }
-          wx.showToast({title: message, icon: "none"})
+        let flag = !this.userInfo.attention;
+        this.$parent.showCustomLoading("处理中...");
+        if (flag) {
+          console.log("关注");
+          Util.commonRequest(
+            this.$parent.globalData.backUrl + "user/attentionAction",
+            this.userInfo.openId,
+            false,
+            this.$parent
+          ).then(res => {
+            if (res && res.success) {
+              let message = "关注成功";
+              this.userInfo.attention = flag;
+              if (res.allAttention) {
+                message = "您与他/她已经互相关注，可查看对方微信号哦";
+                this.userInfo.allAttention = flag;
+              }
+              this.$parent.showErrorToast(message);
+              this.$apply();
+            }else {
+              this.$parent.showErrorToast("关注失败,请稍后重试!");
+            }
+          });
         }else {
-          wx.showToast({title: "取消关注成功", icon: "none"})
-
+          console.log("取消关注");
+          Util.commonRequest(
+            this.$parent.globalData.backUrl + "user/cancelAttention",
+            this.userInfo.openId,
+            false,
+            this.$parent
+          ).then(res => {
+            if (res) {
+              let message = "取消关注成功";
+              this.userInfo.attention = flag;
+              this.userInfo.allAttention = flag;
+              this.$parent.showErrorToast(message);
+              this.$apply();
+            }else {
+              this.$parent.showErrorToast("取消关注失败,请稍后重试!");
+            }
+          });
         }
       },
       wxNumClick() {
-        wx.showModal({title: "微信号",content: "xshwpssdfa", showCancel: false})
+        if (this.userInfo.allAttention === true) {
+          if (this.wxNumber != null && this.wxNumber !== "") {
+            wx.showModal({title: "微信号",content: this.wxNumber, showCancel: false})
+          }else {
+            this.$parent.showCustomLoading("加载中...");
+            Util.commonRequest(
+              this.$parent.globalData.backUrl + "user/getUserSecurity",
+              this.userInfo.openId,
+              true,
+              this.$parent
+            ).then(res => {
+              wx.hideLoading();
+              if(res) {
+                this.wxNumber = res;
+                wx.showModal({title: "微信号",content: this.wxNumber, showCancel: false})
+              }else {
+                this.$parent.showErrorToast("微信号获取失败,请稍后重试！");
+              }
+            })
+          }
+        }else {
+          wx.showModal({title: "提示",content: "没有互相关注不能查看微信号", showCancel: false})
+        }
       }
     }
     onLoad() {
