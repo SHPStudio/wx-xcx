@@ -11,8 +11,7 @@
         <block wx:if="{{noData}}">已经到底啦</block>
     </view>
 
-    <!--授权弹框-->
-    <zanDialog/>
+
 </template>
 
 <script>
@@ -47,7 +46,8 @@
           totalPage: 1
         },
         noData: false,
-        load:true
+        load:true,
+        isError: false
     }
 
     methods = {
@@ -64,7 +64,7 @@
         wx.stopPullDownRefresh();
       }else {
         Util.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, false, this.$parent)
-          .then(res => this.topLoadData(res))
+          .then(res => this.topLoadData(res)).catch(error => Util.processErrorMessage(error, false))
       }
     }
 
@@ -77,7 +77,7 @@
         this.noData = true;
       }else {
         Util.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, false, this.$parent)
-          .then(res => this.downLoadData(res))
+          .then(res => this.downLoadData(res)).catch(error => Util.processErrorMessage(error, false))
       }
     }
 
@@ -86,6 +86,8 @@
      * @param data 来自服务器的列表数据
      */
     loadData(data) {
+      this.isError = false;
+      // wx.showTabBar({animation: true});
       console.log("请求到的数据：", data)
       this.dataList = this.processData(data.dataList);
       this.page.pageIndex += 1;
@@ -155,7 +157,14 @@
       this.$apply();
     }
 
-    onLoad() {
+    onShow() {
+      if (this.isError) {
+        this.initLoad();
+      }
+    }
+
+    initLoad() {
+      // wx.hideTabBar();
       this.$parent.showCustomLoading("加载中...");
 
       // 初始处理链
@@ -179,7 +188,7 @@
         })
         .then(res => {
           console.log("启动首个请求：", res)
-          return Util.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, true, this.$parent)
+          return Util.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, true, this.$parent, true);
         })
         .then(res => {
           console.log("成功获得信息:", res)
@@ -187,10 +196,14 @@
           this.loadData(res)
         })
         .catch(error => {
-          console.log(error)
-          wx.hideLoading()
-          wx.showToast({"title": "系统异常，请稍后重试", "icon": "none"})
+          this.isError = true;
+          Util.processErrorMessage(error);
         })
+    }
+
+
+    onLoad() {
+      this.initLoad()
     }
   }
 </script>

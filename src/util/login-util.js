@@ -9,7 +9,7 @@ export default {
   async doLogin(thatParent) {
     console.log("进行登录", thatParent);
     let userSession = wx.getStorageSync(thatParent.globalData.userInfoSessionKey)
-    console.log("session", userSession)
+    console.log("session", userSession);
     if (null == userSession || userSession == "") {
       const code = await this.getCodeFromWx();
       console.log("获取code" + code);
@@ -34,7 +34,7 @@ export default {
 
       if (userSession.level == "user") {
         // 请求服务器获取
-        userInfo = await Util.commonRequest(that.$parent.globalData.backUrl + "user/getUserInfo",null,false, that.$parent);
+        userInfo = await Util.commonRequest(that.$parent.globalData.backUrl + "user/getUserInfo",null,false, that.$parent, true);
       }else {
         // 检查是否授权
         let isAuthorize = await this.checkAuthorize();
@@ -70,7 +70,7 @@ export default {
         },
         fail(res) {
           console.log("wx.login fail: ", res)
-          resolve(null)
+          reject("wx.login error");
         }
       })
     })
@@ -80,7 +80,7 @@ export default {
     if (code == null)
       return null;
 
-    return new Promise(resolve => {
+    return new Promise((resolve,reject) => {
       console.log("调用getSessionIdFromServer", code, thatParent)
       wepy.request({
         url: thatParent.globalData.backUrl + "login/login",
@@ -105,6 +105,10 @@ export default {
             console.log("调用getSessionIdFromServer fail :", e)
             resolve(null)
           }
+        },
+        fail(res) {
+          console.log("server.login error:", res);
+          reject("server.login error");
         }
       })
     })
@@ -132,28 +136,8 @@ export default {
   },
 
   getUserInfoPopModal(that) {
-    wx.hideLoading()
-    return new Promise(resolve => {
-      that.$invoke('zanDialog', 'showZanDialog', {
-        title: '认证',
-        content: '请先认证信息',
-        buttons:[
-          {
-            text: '取消',
-            type: 'cancel'
-          },
-          {
-            text: '授权',
-            type: 'xxxx',
-            opentype: "getUserInfo"
-          }
-        ]
-      }).then((e) => {
-        resolve(e.detail.userInfo)
-      }).catch(() => {
-        console.log('=== dialog ===', 'type: cancel')
-        resolve(null)
-      })
+    return new Promise((resolve,reject) => {
+      reject("userPopModal")
     })
   }
 

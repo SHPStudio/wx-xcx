@@ -17,7 +17,6 @@
   "author": "Shape <1328445041@qq.com>",
   "license": "MIT",
   "dependencies": {
-    "kai-ui": "^1.2.3",
     "we-cropper": "^1.2.0",
     "wepy": "^1.6.0",
     "wepy-async-function": "^1.4.4",

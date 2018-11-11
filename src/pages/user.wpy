@@ -26,12 +26,6 @@
     top: 50%;
     margin-top: -30rpx;
   }
-
-  .menu {
-    background: #fff;
-    margin-top: 20rpx;
-    width: 100%;
-  }
 </style>
 <template>
   <view class="container" style="padding-top: 0">
@@ -60,6 +54,7 @@
   import wepy from 'wepy'
   import menu from '../components/menu/menu'
   import LoginUtil from '../util/login-util'
+  import Util from '../util/util'
 
   export default class User extends wepy.page {
     config = {
@@ -117,13 +112,14 @@
     }
 
     onShow() {
+      // wx.hideTabBar();
       this.$parent.showCustomLoading("加载中...");
       // 为了更新用户信息的审核状态 一到用户页就删除本地缓存 重新获取
       wx.removeStorageSync(this.$parent.globalData.userInfoStorageKey);
 
       LoginUtil.getUserInfo(this,false)
         .then(res => {
-          wx.hideLoading();
+          // wx.showTabBar({animation: true});
           if (res == null || res === "") {
             console.log("用户页未授权开始执行授权处理")
             this.show = false;
@@ -134,7 +130,8 @@
             this.show = true;
           }
           this.$apply();
-        })
+          wx.nextTick( () => wx.hideLoading())
+        }).catch(error => Util.processErrorMessage(error))
     }
   }
 </script>

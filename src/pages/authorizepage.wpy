@@ -1,0 +1,60 @@
+<template>
+  <!--授权弹框-->
+  <zanDialog/>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import zanDialog from '../components/dialog/zan-dialog'
+
+  export default class extends wepy.page {
+
+    config = {
+      navigationBarTitleText: '授权',
+    }
+
+    data = {
+
+    }
+
+    components = {
+      zanDialog
+    }
+
+    onLoad() {
+      wx.hideLoading();
+      this.$invoke('zanDialog', 'showZanDialog', {
+            title: '认证',
+            content: '请先认证信息',
+            buttons:[
+              {
+                text: '取消',
+                type: 'cancel'
+              },
+              {
+                text: '授权',
+                type: 'xxxx',
+                opentype: "getUserInfo"
+              }
+            ]
+          }).then((e) => {
+            wx.setStorageSync(this.$parent.globalData.userInfoSessionKey, e.detail.userInfo);
+            wx.navigateBack();
+          }).catch(() => {
+            console.log('=== dialog ===', 'type: cancel');
+            wx.navigateBack();
+          })
+    }
+
+    methods = {
+    }
+
+
+  }
+
+
+</script>
+
+<style lang="less">
+
+</style>

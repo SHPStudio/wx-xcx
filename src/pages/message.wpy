@@ -2,20 +2,31 @@
 </style>
 <template>
   <view class="container">
-      <nosupport></nosupport>
+    <view  style="width: 100%">
+      <menu :menulist="menuList"></menu>
+    </view>
   </view>
 </template>
 
 <script>
   import wepy from 'wepy'
-  import nosupport from '../components/no-support'
+  import menu from '../components/menu/menu'
 
   export default class Message extends wepy.page {
     config = {
       navigationBarTitleText: '消息'
     }
+
+    data= {
+      menuList: {
+        list:  [
+          {url: "../image/happy1.png", text: "我的关注", path: "/pages/attention"}
+        ]
+      }
+    }
+
     components = {
-      nosupport: nosupport
+      menu
     }
   }
 </script>

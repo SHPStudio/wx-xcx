@@ -23,6 +23,11 @@
   height: 3rpx;
   background: #dedede;
 }
+.menu {
+  background: #fff;
+  margin-top: 20rpx;
+  width: 100%;
+}
 </style>
 
 <script>
@@ -39,13 +44,14 @@ export default class extends wepy.app {
   config = {
     pages: [
       'pages/index_test',
-      'pages/cropperpage',
       'pages/user_set_info',
       'pages/user_info',
-      'pages/index',
       'pages/friends',
       'pages/message',
-      'pages/user'
+      'pages/user',
+      'pages/errorpage',
+      'pages/authorizepage',
+      'pages/attention'
     ],
     window: {
       backgroundTextStyle: 'dark',
@@ -65,12 +71,6 @@ export default class extends wepy.app {
           iconPath: 'image/home2.png'
         },
         {
-          pagePath: "pages/friends",
-          text: "交友",
-          selectedIconPath: "image/happy1.png",
-          iconPath: 'image/happy2.png'
-        },
-        {
           pagePath: "pages/message",
           text: "消息",
           selectedIconPath: "image/message1.png",
@@ -83,13 +83,16 @@ export default class extends wepy.app {
           iconPath: 'image/user2.png'
         }
       ]
+    },
+    networkTimeout: {
+      request:4000
     }
   }
 
   globalData = {
     userInfo: null,
     backUrl: 'http://192.168.137.1:8080/',
-    imageUrl: 'http://192.168.56.103:4869/',
+    imageUrl: 'http://www.shpcoder.cn:4869/',
     userInfoStorageKey: "userInfo",
     userInfoSessionKey: "sessionkey",
     sexList: [
@@ -139,7 +142,8 @@ export default class extends wepy.app {
   }
 
   onLaunch() {
-    console.log("qidong")
+    console.log("qidong");
+    // wx.hideTabBar();
     wx.showTabBarRedDot({
       index: 2,
     })

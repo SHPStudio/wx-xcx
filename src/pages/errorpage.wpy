@@ -1,0 +1,36 @@
+<template>
+  <view>网络异常，请稍后重试</view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  export default class extends wepy.page {
+
+    config = {
+      navigationBarTitleText: '系统异常',
+    }
+
+    data = {
+
+    }
+
+    components = {
+    }
+
+    onLoad() {
+
+    }
+
+    methods = {
+    }
+
+
+  }
+
+
+</script>
+
+<style lang="less">
+
+</style>

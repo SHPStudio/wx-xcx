@@ -55,10 +55,6 @@ export default {
     fail (p) {
       console.log('request fail: ', p);
       // 必须返回响应数据对象，否则后续无法对响应数据进行处理
-      wx.showToast({
-        title: "服务器异常,请稍后重试",
-        icon: "none",
-      })
       return p;
     },
 

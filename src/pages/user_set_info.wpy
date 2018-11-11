@@ -213,6 +213,9 @@
               _this.$invoke('cropperpage', 'showCropperPage', file[0] , index)
             }
             _this.$apply();
+          },
+          fail(res) {
+            Util.processErrorMessage(res, false);
           }
         })
       },
@@ -236,7 +239,7 @@
       uploadImg(file, index, content) {
         console.log()
         Util.commonUploadImg(content.$parent.globalData.backUrl + "user/uploadImg",
-          file, content)
+          file, content.$parent)
           .then(res => {
             console.log(res)
             if (res == null) {
@@ -253,7 +256,7 @@
             }
             content.choosingPhoto = false;
             content.$apply();
-          })
+          }).catch(error => Util.processErrorMessage(error, false))
       },
 
       /**
@@ -281,7 +284,7 @@
         let submitInfo = {};
         Object.assign(submitInfo, this.userInfo)
         submitInfo.photos = JSON.stringify(this.userInfo.photos)
-        if (this.userSession.level == 'guest') {
+        if (this.userSession.level === 'guest') {
           console.log("用户新提交信息")
           Util.commonRequest(this.$parent.globalData.backUrl + "user/saveUserInfo", submitInfo, true, this.$parent)
             .then(res => {
@@ -348,7 +351,7 @@
             this.userInfo = this.processUserInfo(res);
           }
           wx.hideLoading();
-        });
+        }).catch();
     }
 
     /**
@@ -409,7 +412,7 @@
       this.userInfo.weight = this.fatArray.items[this.fatArray.itemIndex];
     }
 
-    onLoad() {
+    onShow() {
       this.imageUrl = this.$parent.globalData.imageUrl;
       this.sexArray.items = this.$parent.globalData.sexList;
       this.constellationArray.items = this.$parent.globalData.constellationList;

@@ -15,14 +15,14 @@ export default {
 
   async commonRequest(url, data, loading, thatParent) {
     if (loading) {
-      wx.showLoading({title: "玩儿命加载中"})
+      this.showCustomLoading("玩儿命加载中")
     }
     let result = await this.request(url, data);
 
     if (result === 'notlogin') {
       console.log("没有登录")
-      wx.removeStorageSync(thatParent.globalData.userInfoSessionKey)
-      await LoginUtil.doLogin(thatParent)
+      wx.removeStorageSync(thatParent.globalData.userInfoSessionKey);
+      await LoginUtil.doLogin(thatParent);
       result = await this.request(url, data)
     }
 
@@ -30,14 +30,14 @@ export default {
 
   },
 
-  async commonUploadImg(url, file, that) {
-    that.$parent.showCustomLoading("处理中....")
+  async commonUploadImg(url, file, thatParent) {
+    thatParent.showCustomLoading("处理中....")
     let result = await this.upload(url, file);
 
     if (result === 'notlogin') {
       console.log("上传图片没有登录");
-      wx.removeStorageSync(that.globalData.userInfoSessionKey)
-      await LoginUtil.doLogin(that)
+      wx.removeStorageSync(thatParent.globalData.userInfoSessionKey)
+      await LoginUtil.doLogin(thatParent)
       result = await this.upload(url, file)
     }
 
@@ -46,7 +46,7 @@ export default {
   },
 
   request(url, data) {
-    return new Promise(resolve => {
+    return new Promise((resolve,reject) => {
       let method = data == null ? "GET" : "POST";
       wepy.request({
         url: url,
@@ -56,14 +56,15 @@ export default {
           resolve(res.data)
         },
         fail(res) {
-          resolve(null)
+          console.log("request error :" ,res);
+          reject("request error")
         }
       })
     })
   },
 
   upload(url, file) {
-    return new Promise(resolve => {
+    return new Promise((resolve,reject) => {
       wepy.uploadFile({
         url: url,
         filePath: file,
@@ -72,9 +73,25 @@ export default {
           resolve(res.data)
         },
         fail(res) {
-          resolve(null)
+          console.log("wx.uploadFile error", res);
+          reject("wx.uploadFile error");
         }
       })
     })
+  },
+
+  processErrorMessage(error, goPage=true) {
+    console.log(error);
+    if (goPage) {
+      if (error === "userPopModal") {
+        console.log(error);
+        wx.navigateTo({url: "/pages/authorizepage"});
+      }else {
+        wx.navigateTo({url: "/pages/errorpage"});
+      }
+    }else {
+       this.showErrorToast("系统异常请稍后重试！");
+    }
+    wx.hideLoading()
   }
 }

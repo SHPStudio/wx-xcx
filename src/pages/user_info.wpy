@@ -160,7 +160,7 @@
             }else {
               this.$parent.showErrorToast("关注失败,请稍后重试!");
             }
-          });
+          }).catch(error => Util.processErrorMessage(error, false));
         }else {
           console.log("取消关注");
           Util.commonRequest(
@@ -178,7 +178,7 @@
             }else {
               this.$parent.showErrorToast("取消关注失败,请稍后重试!");
             }
-          });
+          }).catch(error => Util.processErrorMessage(error, false));
         }
       },
       wxNumClick() {
@@ -200,21 +200,22 @@
               }else {
                 this.$parent.showErrorToast("微信号获取失败,请稍后重试！");
               }
-            })
+            }).catch(error => Util.processErrorMessage(error, false))
           }
         }else {
           wx.showModal({title: "提示",content: "没有互相关注不能查看微信号", showCancel: false})
         }
       }
     }
-    onLoad() {
+    onShow() {
       console.log(this.$wxpage.options.openId)
       this.openId = this.$wxpage.options.openId;
       this.imageUrl = this.$parent.globalData.imageUrl;
+      this.$parent.showCustomLoading("加载中...");
       Util.commonRequest(
         this.$parent.globalData.backUrl + "user/getOtherUserInfo",
         this.openId,
-        true,
+        false,
         this.$parent
       ).then(res => {
         console.log(res)
@@ -225,11 +226,7 @@
         }else {
           this.$parent.showErrorToast(res.message);
         }
-      }).catch(error => {
-        wx.hideLoading();
-        console.log("发生异常：", error);
-        this.$parent.showErrorToast("系统异常，请稍后重试");
-      })
+      }).catch(error => Util.processErrorMessage(error));
     }
   };
 </script>

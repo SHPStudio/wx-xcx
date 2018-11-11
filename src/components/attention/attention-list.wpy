@@ -1,0 +1,38 @@
+<style lang="less" >
+  .attention-list {
+    margin-top: 25rpx;
+  }
+</style>
+<template>
+  <view class="attention-list">
+    <repeat for="{{attention.list}}" item="item" index="index">
+      <attentionItem :item.sync="item"></attentionItem>
+    </repeat>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import AttentionItem from './attention-item'
+
+  export default class extends wepy.component {
+    components = {
+      attentionItem: AttentionItem
+    }
+    props = {
+      attention:{twoWay: true}
+    }
+    data = {
+    }
+    methods = {
+
+    }
+    computed = {
+
+    }
+
+    onLoad() {
+      console.log("load")
+    }
+
+  }
+</script>

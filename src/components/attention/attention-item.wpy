@@ -1,0 +1,69 @@
+<style lang="less" >
+  .attention-item {
+    background: #fff;
+    height: 150rpx;
+    display: flex;
+    align-items: center;
+
+    image{
+      width: 110rpx;
+      height: 110rpx;
+      border-radius: 15rpx;
+      margin-left: 50rpx;
+    }
+
+    text {
+      font-size: 35rpx;
+      margin-left: 25rpx;
+    }
+
+    button {
+      background: transparent;
+      border: #999999 1rpx solid;
+      color: #999999;
+      margin-right: 25rpx;
+      width: 150rpx;
+      height: 60rpx;
+      font-size: 25rpx;
+
+    }
+  }
+</style>
+<template>
+  <view class="attention-item" @tap="goTo">
+    <image src="{{imgUrl + item.photo}}"></image>
+    <text>{{item.name}}</text>
+    <view class="fill-content"></view>
+    <button size="mini">已关注</button>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+
+  export default class extends wepy.component {
+    components = {
+    }
+    props = {
+      item:{twoWay: true}
+    }
+    data = {
+      imgUrl: ""
+    }
+    methods = {
+      goTo() {
+        wx.navigateTo({
+          url: `/pages/user_info?openId=${this.item.openId}`
+        })
+      }
+    }
+    computed = {
+
+    }
+
+    onLoad() {
+      console.log(this)
+      this.imgUrl = this.$root.$parent.globalData.imageUrl;
+    }
+
+  }
+</script>
