@@ -30,7 +30,7 @@
 <template>
   <view class="container" style="padding-top: 0">
     <!--用户页展示-->
-    <div wx:if="{{show}}" style="width: 100%">
+    <div style="width: 100%">
       <!--头像条-->
       <view  class="user-info" @tap="goUserInfo">
         <image src="{{userInfo.avatarUrl}}"></image>
@@ -42,17 +42,14 @@
           <menu :menulist="menuList"></menu>
       </view>
     </div>
-
-    <!--授权按钮-->
-    <view wx:else style="margin-top: 50%;">
-      <button size="mini" plain="true" open-type="getUserInfo" @getuserinfo="getUserInfo">登录</button>
-    </view>
   </view>
+  <loading></loading>
 </template>
 
 <script>
   import wepy from 'wepy'
   import menu from '../components/menu/menu'
+  import loading from '../components/loading/loading2'
   import LoginUtil from '../util/login-util'
   import Util from '../util/util'
 
@@ -61,23 +58,21 @@
       navigationBarTitleText: '用户',
     }
     components = {
-      menu: menu
+      menu: menu,
+      loading
     }
 
 
     data = {
-      show: false,
       userInfo: {
         avatarUrl: '',
-        nickName: '',
+        nickName: 'shape',
         status: null
       },
       menuList:{
         list:  [
-          {url: "../image/happy1.png", text: "测试", path: "/pages/index"},
-          {url: "../image/happy1.png", text: "测试", path: "/pages/index"},
-          {url: "../image/happy1.png", text: "测试", path: "/pages/index"},
-          {url: "../image/happy1.png", text: "测试", path: "/pages/index"}
+          {url: "/image/fankui.png", text: "意见反馈", path: "/pages/index"},
+          {url: "/image/about.png", text: "关于", path: "/pages/index"}
         ]
       }
     }
@@ -115,9 +110,11 @@
       // wx.hideTabBar();
       this.$parent.showCustomLoading("加载中...");
       // 为了更新用户信息的审核状态 一到用户页就删除本地缓存 重新获取
-      wx.removeStorageSync(this.$parent.globalData.userInfoStorageKey);
+      if (wx.getStorageSync(this.$parent.globalData.userInfoSessionKey).level != "guest") {
+        wx.removeStorageSync(this.$parent.globalData.userInfoStorageKey);
+      }
 
-      LoginUtil.getUserInfo(this,false)
+      LoginUtil.getUserInfo(this,true)
         .then(res => {
           // wx.showTabBar({animation: true});
           if (res == null || res === "") {
@@ -130,8 +127,11 @@
             this.show = true;
           }
           this.$apply();
-          wx.nextTick( () => wx.hideLoading())
-        }).catch(error => Util.processErrorMessage(error))
+          wx.nextTick( () => {this.$invoke("loading", "hideMask"); wx.hideLoading();})
+        }).catch(error => {
+          wx.hideLoading();
+          Util.processErrorMessage(error, this)
+        })
     }
   }
 </script>

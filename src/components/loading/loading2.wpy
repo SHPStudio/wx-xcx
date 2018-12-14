@@ -1,0 +1,74 @@
+<template>
+    <view class="custom-load" wx:if="{{show}}" style="position: {{position}}">
+      <view class="content">
+        <loadicon wx:if="{{status === 0}}" type="circle" size="big"></loadicon>
+        <text wx:if="{{status === 1}}">暂无数据</text>
+        <image src="/image/error.png" wx:if="{{status === 2}}">网络异常</image>
+      </view>
+    </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import loadicon from '../kaiui/loading/index'
+  export default class Loading extends wepy.component {
+
+    props={
+      position: {default: "absolute"}
+    }
+
+    data = {
+      img: '/image/load/load.gif',
+      status: 0,
+      show: false
+    }
+
+    components = {
+      loadicon
+    }
+
+    methods = {
+      showLoading() {
+        this.status = 0;
+        this.show = true;
+      },
+      showNetworkError() {
+        this.status = 2;
+        this.show = true;
+      },
+      showNoData() {
+        this.status = 1;
+        this.show = true;
+      },
+      hideMask() {
+        this.show = false;
+      }
+    }
+
+    onLoad() {
+    }
+  };
+</script>
+
+<style lang="less">
+    .custom-load {
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background: #f4f4f4;
+
+      .content {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+
+        image {
+          width: 354rpx;
+          height: 317rpx;
+        }
+      }
+    }
+</style>

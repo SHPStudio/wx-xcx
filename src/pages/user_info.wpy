@@ -42,6 +42,7 @@
         </view>
       </view>
     </view>
+  <loading></loading>
 </template>
 
 <script>
@@ -49,6 +50,7 @@
   import SexInfo from '../components/userinfo/sex-info'
   import BaseInfo from '../components/userinfo/user-info-base'
   import ExtInfo  from '../components/userinfo/user-info-ext'
+  import loading from '../components/loading/loading2'
   import Util from '../util/util'
   const device = wx.getSystemInfoSync()
   const width = device.windowWidth
@@ -68,7 +70,8 @@
       selfEvulateExtInfo: ExtInfo,
       wantSayExtInfo: ExtInfo,
       homeStatusExtInfo: ExtInfo,
-      friendStandardExtInfo: ExtInfo
+      friendStandardExtInfo: ExtInfo,
+      loading
     }
     data = {
       userInfo: { birthday: "1999-01-20"},
@@ -160,7 +163,7 @@
             }else {
               this.$parent.showErrorToast("关注失败,请稍后重试!");
             }
-          }).catch(error => Util.processErrorMessage(error, false));
+          }).catch(error => Util.processErrorMessage(error, this, false));
         }else {
           console.log("取消关注");
           Util.commonRequest(
@@ -178,7 +181,7 @@
             }else {
               this.$parent.showErrorToast("取消关注失败,请稍后重试!");
             }
-          }).catch(error => Util.processErrorMessage(error, false));
+          }).catch(error => Util.processErrorMessage(error, this, false));
         }
       },
       wxNumClick() {
@@ -200,25 +203,26 @@
               }else {
                 this.$parent.showErrorToast("微信号获取失败,请稍后重试！");
               }
-            }).catch(error => Util.processErrorMessage(error, false))
+            }).catch(error => Util.processErrorMessage(error, this, false))
           }
         }else {
           wx.showModal({title: "提示",content: "没有互相关注不能查看微信号", showCancel: false})
         }
       }
     }
-    onShow() {
+    onLoad() {
+      this.$invoke("loading", "showLoading");
       console.log(this.$wxpage.options.openId)
       this.openId = this.$wxpage.options.openId;
       this.imageUrl = this.$parent.globalData.imageUrl;
-      this.$parent.showCustomLoading("加载中...");
       Util.commonRequest(
         this.$parent.globalData.backUrl + "user/getOtherUserInfo",
         this.openId,
         false,
         this.$parent
       ).then(res => {
-        console.log(res)
+        console.log(res);
+        this.$invoke("loading", "hideMask");
         wx.hideLoading();
         if(res.success) {
           this.userInfo = res.data;
@@ -226,7 +230,7 @@
         }else {
           this.$parent.showErrorToast(res.message);
         }
-      }).catch(error => Util.processErrorMessage(error));
+      }).catch(error => Util.processErrorMessage(error, this));
     }
   };
 </script>

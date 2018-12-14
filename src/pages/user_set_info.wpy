@@ -32,11 +32,13 @@
       <!--用户基本信息-->
       <view class="title">基本信息</view>
       <view class="content base-info">
-        <view class="text-input"><text>昵称</text><view class="fill-content"></view><input value="{{userInfo.name}}" bindinput="bindInputValue('name')" placeholder="请输入昵称" /></view>
+        <view class="text-input"><text>昵称</text><text style="color:red;">*</text><view class="fill-content"></view><input value="{{userInfo.name}}" bindinput="bindInputValue('name')" placeholder="请输入昵称" /></view>
         <view class="line" style="margin-top: 15rpx;"></view>
-        <view class="pick-input" style="margin-top: 15rpx;"><text>性别</text><view class="fill-content"></view>
+        <view class="pick-input" style="margin-top: 15rpx;"><text>性别</text><text style="color:red;">*</text><view class="fill-content"></view>
           <sexpicker :items.sync="sexArray" ></sexpicker>
         </view>
+        <view class="line" style="margin-top: 15rpx;"></view>
+        <view class="text-input"><text>微信号</text><text style="color:red;">*</text><view class="fill-content"></view><input value="{{userInfo.wxNumber}}" bindinput="bindInputValue('wxNumber')" placeholder="请输入微信号" /></view>
         <view class="line" style="margin-top: 15rpx;"></view>
         <view class="pick-input" style="margin-top: 15rpx;"><text>生日</text><view class="fill-content"></view>
           <datepicker :item.sync="birthdayDate"></datepicker>
@@ -215,7 +217,7 @@
             _this.$apply();
           },
           fail(res) {
-            Util.processErrorMessage(res, false);
+            Util.processErrorMessage(res, this, false);
           }
         })
       },
@@ -256,7 +258,7 @@
             }
             content.choosingPhoto = false;
             content.$apply();
-          }).catch(error => Util.processErrorMessage(error, false))
+          }).catch(error => Util.processErrorMessage(error, content, false))
       },
 
       /**
@@ -304,7 +306,7 @@
                 scrollTop: 0,
                 duration: 300
               })
-            })
+            }).catch(error => Util.processErrorMessage(error, this, false))
         }else {
           console.log("用户更新信息")
           Util.commonRequest(this.$parent.globalData.backUrl + "user/updateUserInfo", submitInfo, true, this.$parent)
@@ -321,7 +323,7 @@
                 scrollTop: 0,
                 duration: 300
               })
-            })
+            }).catch(error => Util.processErrorMessage(error, this, false))
         }
 
       },
@@ -351,7 +353,7 @@
             this.userInfo = this.processUserInfo(res);
           }
           wx.hideLoading();
-        }).catch();
+        }).catch(error => Util.processErrorMessage(error, this, false));
     }
 
     /**

@@ -1,13 +1,14 @@
 <template>
-  <view>
+  <view class="attention-view">
     <tab @bindChange.user="change"/>
-    <view>
+    <view class="attention-content">
       <view wx:if="{{tab2.selectedId === 2}}">
         <toAttentionList :attention.sync="toAttention"></toAttentionList>
       </view>
       <view wx:if="{{tab2.selectedId === 1}}">
        <selfAttentionList :attention.sync="selfAttention"></selfAttentionList>
       </view>
+      <loading></loading>
     </view>
   </view>
 </template>
@@ -17,6 +18,7 @@
   import Tab from '../components/kaiui/tab/index'
   import AttentionList from '../components/attention/attention-list'
   import Util from '../util/util'
+  import loading from '../components/loading/loading2'
 
   export default class extends wepy.page {
     config = {
@@ -48,47 +50,56 @@
     }
 
     loadToAttentionList() {
-      Util.commonRequest(this.$parent.globalData.backUrl + "attention/list", this.toAttentionQuery, true, this.$parent)
+      this.$invoke("loading", "showLoading");
+      Util.commonRequest(this.$parent.globalData.backUrl + "attention/list", this.toAttentionQuery, false, this.$parent)
         .then(res => {
-          wx.hideLoading();
-          console.log(res)
+          this.$invoke("loading","hideMask");
+          console.log(res);
+          if (res.length === 0) {
+            this.$invoke("loading","showNoData");
+          }
           this.toAttention.list = res;
           this.$apply();
         })
-        .catch(error=> Util.processErrorMessage(error, false));
+        .catch(error=> Util.processErrorMessage(error, this));
     }
 
     loadSelfAttentionList() {
-      Util.commonRequest(this.$parent.globalData.backUrl + "attention/list", this.selfAttentionQuery, true, this.$parent)
+      this.$invoke("loading", "showLoading");
+      Util.commonRequest(this.$parent.globalData.backUrl + "attention/list", this.selfAttentionQuery, false, this.$parent)
         .then(res => {
-          wx.hideLoading();
+          this.$invoke("loading","hideMask");
           console.log(res);
+          if (res.length === 0) {
+            this.$invoke("loading","showNoData");
+          }
           this.selfAttention.list = res;
           this.$apply();
         })
-        .catch(error=> Util.processErrorMessage(error, false));
+        .catch(error=> Util.processErrorMessage(error, this));
     }
 
     methods = {
       change(res) {
         this.tab2.selectedId = res;
-        this.$apply()
+        this.$apply();
         if (res === 2) {
           this.loadToAttentionList();
         }else {
           this.loadSelfAttentionList();
         }
       }
-    }
+    };
 
     components = {
       tab: Tab,
       toAttentionList: AttentionList,
-      selfAttentionList: AttentionList
+      selfAttentionList: AttentionList,
+      loading
     }
 
     onLoad() {
-      const { tab2 } = this
+      const { tab2 } = this;
       this.$invoke('tab', 'doInitTabData', tab2)
       this.loadToAttentionList();
     }
@@ -99,5 +110,17 @@
 </script>
 
 <style lang="less">
+  .attention-view {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
 
+    .attention-content {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+  }
 </style>

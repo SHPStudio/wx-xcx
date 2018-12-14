@@ -145,7 +145,7 @@ export default class extends wepy.app {
     console.log("qidong");
     // wx.hideTabBar();
     wx.showTabBarRedDot({
-      index: 2,
+      index: 1,
     })
   }
 }

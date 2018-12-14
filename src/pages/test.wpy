@@ -1,0 +1,40 @@
+<template>
+  <loading></loading>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import Loading from '../components/loading/loading2'
+
+  export default class extends wepy.page {
+
+    config = {
+      navigationBarTitleText: '加载',
+    }
+
+    data = {
+
+    }
+
+    components = {
+      loading: Loading
+    }
+
+    onLoad() {
+      this.$invoke("loading", "showLoading");
+      setTimeout(() => this.$invoke("loading", "showNetworkError"), 3000)
+      setTimeout(() => this.$invoke("loading", "hideMask"), 5000)
+    }
+
+    methods = {
+    }
+
+
+  }
+
+
+</script>
+
+<style lang="less">
+
+</style>

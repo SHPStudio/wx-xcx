@@ -70,6 +70,7 @@ export default {
         filePath: file,
         name: 'file',
         success(res) {
+          console.log("wx.uploadFile success:", res);
           resolve(res.data)
         },
         fail(res) {
@@ -80,18 +81,18 @@ export default {
     })
   },
 
-  processErrorMessage(error, goPage=true) {
+  processErrorMessage(error, content, goPage=true) {
     console.log(error);
     if (goPage) {
       if (error === "userPopModal") {
         console.log(error);
         wx.navigateTo({url: "/pages/authorizepage"});
       }else {
-        wx.navigateTo({url: "/pages/errorpage"});
+        // wx.navigateTo({url: "/pages/errorpage"});
+        content.$invoke("loading", "showNetworkError");
       }
     }else {
-       this.showErrorToast("系统异常请稍后重试！");
+      wx.showToast({'title': "系统异常请稍后重试！", duration: 2000, icon: "none"})
     }
-    wx.hideLoading()
   }
 }

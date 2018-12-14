@@ -8,10 +8,9 @@
           <!--列表单条记录-->
           <single :item="item"></single>
         </repeat>
-        <block wx:if="{{noData}}">已经到底啦</block>
+        <loadmore :more.sync="more"></loadmore>
     </view>
-
-
+  <loading></loading>
 </template>
 
 <script>
@@ -20,6 +19,8 @@
   import zanDialog from '../components/dialog/zan-dialog'
   import LoginUtil from '../util/login-util'
   import Util from '../util/util'
+  import LoadMore from '../components/kaiui/loadmore/index'
+  import Loading from '../components/loading/loading2'
 
   export default class Index extends wepy.page {
     config = {
@@ -30,7 +31,9 @@
 
     components = {
       single: Single,
-      zanDialog
+      zanDialog,
+      loadmore: LoadMore,
+      loading: Loading
     }
 
     data = {
@@ -47,7 +50,12 @@
         },
         noData: false,
         load:true,
-        isError: false
+        isError: false,
+        more: {
+          type: true,
+          loading: '加载中',
+          loaded: '我们是有底线的'
+        }
     }
 
     methods = {
@@ -64,7 +72,10 @@
         wx.stopPullDownRefresh();
       }else {
         Util.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, false, this.$parent)
-          .then(res => this.topLoadData(res)).catch(error => Util.processErrorMessage(error, false))
+          .then(res => this.topLoadData(res)).catch(error => {
+             wx.stopPullDownRefresh();
+             Util.processErrorMessage(error, this, false);
+        })
       }
     }
 
@@ -74,10 +85,10 @@
     onReachBottom() {
       console.log("上拉刷新")
       if (this.page.pageIndex > this.page.totalPage) {
-        this.noData = true;
+        this.more.type = false;
       }else {
         Util.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, false, this.$parent)
-          .then(res => this.downLoadData(res)).catch(error => Util.processErrorMessage(error, false))
+          .then(res => this.downLoadData(res)).catch(error => Util.processErrorMessage(error, this, false))
       }
     }
 
@@ -165,8 +176,8 @@
 
     initLoad() {
       // wx.hideTabBar();
-      this.$parent.showCustomLoading("加载中...");
-
+      // this.$parent.showCustomLoading("加载中...");
+      this.$invoke("loading", "showLoading");
       // 初始处理链
       // 1.先登录获取三方登录态并保存到本地缓存中
       // 2.登录后开始获取用户信息 其实主要是第一次获取用户信息授权用 然后保存到本地缓存
@@ -183,21 +194,21 @@
         })
         .then(res => {
           console.log("成功获得用户信息：", res)
-          wx.hideLoading()
           return res;
         })
         .then(res => {
           console.log("启动首个请求：", res)
-          return Util.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, true, this.$parent, true);
+          return Util.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, false, this.$parent);
         })
         .then(res => {
           console.log("成功获得信息:", res)
-          wx.hideLoading()
+          this.$invoke("loading", "hideMask");
           this.loadData(res)
         })
         .catch(error => {
           this.isError = true;
-          Util.processErrorMessage(error);
+          console.log(error);
+          Util.processErrorMessage(error, this);
         })
     }
 

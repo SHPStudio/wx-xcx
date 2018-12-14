@@ -34,7 +34,7 @@ export default {
 
       if (userSession.level == "user") {
         // 请求服务器获取
-        userInfo = await Util.commonRequest(that.$parent.globalData.backUrl + "user/getUserInfo",null,false, that.$parent, true);
+        userInfo = await Util.commonRequest(that.$parent.globalData.backUrl + "user/getUserInfo",null,false, that.$parent);
       }else {
         // 检查是否授权
         let isAuthorize = await this.checkAuthorize();
@@ -48,8 +48,8 @@ export default {
           }
         }
       }
+      wx.setStorageSync(that.$parent.globalData.userInfoStorageKey, userInfo)
     }
-    wx.setStorageSync(that.$parent.globalData.userInfoStorageKey, userInfo)
     return userInfo;
   },
 
