@@ -78,25 +78,6 @@
     }
     methods = {
       /**
-       * 授权按钮触发方法
-       * 不过一般不会用到了 想的是第一次必须要授权
-       * @param result
-       */
-      getUserInfo(result) {
-        if (!(result && result.detail)) {
-          console.log("授权失败:", result)
-          this.$parent.showErrorToast("授权失败");
-          return;
-        }
-
-        // 成功获取信息放到缓存中
-        wx.setStorageSync(this.$parent.globalData.userInfoStorageKey, result.detail.userInfo)
-        this.userInfo.avatarUrl = result.detail.userInfo.avatarUrl;
-        this.userInfo.nickName = result.detail.userInfo.nickName;
-        this.show = true;
-      },
-
-      /**
        * 点击头像条跳到编辑信息页面
        */
       goUserInfo() {
@@ -116,18 +97,11 @@
 
       LoginUtil.getUserInfo(this,true)
         .then(res => {
-          // wx.showTabBar({animation: true});
-          if (res == null || res === "") {
-            console.log("用户页未授权开始执行授权处理")
-            this.show = false;
-          }else {
-            console.log("用户页已有授权信息", res)
-            this.userInfo.avatarUrl = res.avatarUrl == null ? this.$parent.globalData.imageUrl + JSON.parse(res.photos)[0] : res.avatarUrl;
-            this.userInfo.nickName = res.nickName == null ? res.name: res.nickName;
-            this.show = true;
-          }
+          console.log("用户页已有授权信息", res)
+          this.userInfo.avatarUrl = res.avatarUrl == null ? this.$parent.globalData.imageUrl + JSON.parse(res.photos)[0] : res.avatarUrl;
+          this.userInfo.nickName = res.nickName == null ? res.name: res.nickName;
           this.$apply();
-          wx.nextTick( () => {this.$invoke("loading", "hideMask"); wx.hideLoading();})
+          wx.hideLoading();
         }).catch(error => {
           wx.hideLoading();
           Util.processErrorMessage(error, this)

@@ -40,6 +40,8 @@
         <view class="line" style="margin-top: 15rpx;"></view>
         <view class="text-input"><text>微信号</text><text style="color:red;">*</text><view class="fill-content"></view><input value="{{userInfo.wxNumber}}" bindinput="bindInputValue('wxNumber')" placeholder="请输入微信号" /></view>
         <view class="line" style="margin-top: 15rpx;"></view>
+        <view class="text-input"><text>咚咚号</text><text style="color:red;">*</text><view class="fill-content"></view><input value="{{userInfo.dongdong}}" bindinput="bindInputValue('wxNumber')" placeholder="请输入咚咚号" /></view>
+        <view class="line" style="margin-top: 15rpx;"></view>
         <view class="pick-input" style="margin-top: 15rpx;"><text>生日</text><view class="fill-content"></view>
           <datepicker :item.sync="birthdayDate"></datepicker>
         </view>

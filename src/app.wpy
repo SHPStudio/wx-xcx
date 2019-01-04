@@ -34,8 +34,6 @@
 import wepy from 'wepy'
 import 'wepy-async-function'
 import Interceptors from './interceptor/interceptors'
-import StorageUtil from './util/storage-util'
-import EventBus from './util/event-bus'
 import CustomUtil from  './util/util'
 import CustomLoginUtil from  './util/login-util'
 
@@ -92,7 +90,7 @@ export default class extends wepy.app {
   globalData = {
     userInfo: null,
     backUrl: 'http://192.168.137.1:8080/',
-    imageUrl: 'http://www.shpcoder.cn:4869/',
+    imageUrl: 'http://zimg.shpcoder.cn/',
     userInfoStorageKey: "userInfo",
     userInfoSessionKey: "sessionkey",
     sexList: [
@@ -117,22 +115,12 @@ export default class extends wepy.app {
       "本科",
       "硕士",
       "博士"
-    ],
-    eventBus: EventBus
+    ]
   }
 
   constructor () {
     super()
     this.use('requestfix');
-    this.getFromStorage = StorageUtil.getFromStorage;
-    this.setToStorage = StorageUtil.setToStorage;
-    this.getFromStorageSync = StorageUtil.getFromStorageSync;
-    this.setToStorageSync = StorageUtil.setToStorageSync;
-    this.setUserInfoToStorage = StorageUtil.setUserInfoToStorage;
-    this.getCodeAndLogin = StorageUtil.getCodeAndLogin;
-    this.commonRequest= StorageUtil.commonRequest;
-    this.commonUploadImg= StorageUtil.commonUploadImg;
-    this.login = StorageUtil.login;
     this.showCustomLoading = CustomUtil.showCustomLoading;
     this.showErrorToast = CustomUtil.showErrorToast;
     this.showSuccessToast = CustomUtil.showSuccessToast;
