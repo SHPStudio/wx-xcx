@@ -10,6 +10,6 @@
 	"compileType": "miniprogram",
 	"appid": "wx193b7550e9f8c425",
 	"projectname": "wx",
-	"miniprogramRoot": "./dist",
+	"miniprogramRoot": "dist/",
 	"condition": {}
 }

@@ -94,5 +94,36 @@ export default {
     }else {
       wx.showToast({'title': "系统异常请稍后重试！", duration: 2000, icon: "none"})
     }
+  },
+
+  checkPermission(that) {
+    let session = wx.getStorageSync(that.$parent.globalData.userInfoSessionKey);
+    let userInfo = wx.getStorageSync(that.$parent.globalData.userInfoStorageKey);
+    console.log(userInfo);
+    if (session.level === "guest") {
+      wx.navigateTo({url: "/pages/user_set_info"})
+      return false;
+    }else {
+      if (userInfo.status != null && userInfo.status === 0) {
+        wx.showToast({'title': "请等待审核！", duration: 2000, icon: "none"})
+        return false;
+      }
+    }
+    return true
+  },
+  checkSession() {
+    return new Promise((resolve, reject) => {
+      wx.checkSession({
+        success() {
+          // session_key 未过期，并且在本生命周期一直有效
+          console.log("session未过期")
+          resolve(true)
+        },
+        fail() {
+          // session_key 已经失效，需要重新执行登录流程
+          resolve(false)
+        }
+      })
+    })
   }
 }

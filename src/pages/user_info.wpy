@@ -161,7 +161,10 @@
               this.$parent.showErrorToast(message);
               this.$apply();
             }else {
-              this.$parent.showErrorToast("关注失败,请稍后重试!");
+              if (res.message === "不是真正的用户") {
+                wx.navigateTo({url: "/pages/user_set_info"});
+              }
+              this.$parent.showErrorToast(res.message == null || res.message === "" ? "关注失败,请稍后重试!" : res.message);
             }
           }).catch(error => Util.processErrorMessage(error, this, false));
         }else {
@@ -187,7 +190,7 @@
       wxNumClick() {
         if (this.userInfo.allAttention === true) {
           if (this.wxNumber != null && this.wxNumber !== "") {
-            wx.showModal({title: "微信号",content: this.wxNumber, showCancel: false})
+            wx.showModal({title: "微信号",content: this.wxNumber.toString(), showCancel: false})
           }else {
             this.$parent.showCustomLoading("加载中...");
             Util.commonRequest(
@@ -199,7 +202,7 @@
               wx.hideLoading();
               if(res) {
                 this.wxNumber = res;
-                wx.showModal({title: "微信号",content: this.wxNumber, showCancel: false})
+                wx.showModal({title: "微信号",content: this.wxNumber.toString(), showCancel: false})
               }else {
                 this.$parent.showErrorToast("微信号获取失败,请稍后重试！");
               }

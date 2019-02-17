@@ -35,7 +35,6 @@ import wepy from 'wepy'
 import 'wepy-async-function'
 import Interceptors from './interceptor/interceptors'
 import CustomUtil from  './util/util'
-import CustomLoginUtil from  './util/login-util'
 
 
 export default class extends wepy.app {
@@ -89,7 +88,7 @@ export default class extends wepy.app {
 
   globalData = {
     userInfo: null,
-    backUrl: 'http://192.168.137.1:8080/',
+    backUrl: 'http://192.168.99.132:8080/',
     imageUrl: 'http://zimg.shpcoder.cn/',
     userInfoStorageKey: "userInfo",
     userInfoSessionKey: "sessionkey",
@@ -129,12 +128,19 @@ export default class extends wepy.app {
     this.intercept('uploadFile', Interceptors.uploadFile);
   }
 
-  onLaunch() {
+  async onLaunch() {
     console.log("qidong");
     // wx.hideTabBar();
     wx.showTabBarRedDot({
       index: 1,
     })
+    wx.removeStorageSync(this.globalData.userInfoStorageKey);
+    let flag = await CustomUtil.checkSession();
+    if (!flag) {
+      console.log("缓存失效");
+      await wx.removeStorageSync(this.globalData.userInfoSessionKey)
+    }
+    console.log("done")
   }
 }
 </script>

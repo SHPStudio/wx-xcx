@@ -40,21 +40,21 @@
         <view class="line" style="margin-top: 15rpx;"></view>
         <view class="text-input"><text>微信号</text><text style="color:red;">*</text><view class="fill-content"></view><input value="{{userInfo.wxNumber}}" bindinput="bindInputValue('wxNumber')" placeholder="请输入微信号" /></view>
         <view class="line" style="margin-top: 15rpx;"></view>
-        <view class="text-input"><text>咚咚号</text><text style="color:red;">*</text><view class="fill-content"></view><input value="{{userInfo.dongdong}}" bindinput="bindInputValue('wxNumber')" placeholder="请输入咚咚号" /></view>
+        <view class="text-input"><text>咚咚号</text><text style="color:red;">*</text><view class="fill-content"></view><input value="{{userInfo.dongdong}}" bindinput="bindInputValue('dongdong')" placeholder="请输入咚咚号" /></view>
         <view class="line" style="margin-top: 15rpx;"></view>
-        <view class="pick-input" style="margin-top: 15rpx;"><text>生日</text><view class="fill-content"></view>
+        <view class="pick-input" style="margin-top: 15rpx;"><text>生日</text><text style="color:red;">*</text><view class="fill-content"></view>
           <datepicker :item.sync="birthdayDate"></datepicker>
         </view>
         <view class="line" style="margin-top: 15rpx;"></view>
-        <view class="pick-input" style="margin-top: 15rpx;"><text>星座</text><view class="fill-content"></view>
+        <view class="pick-input" style="margin-top: 15rpx;"><text>星座</text><text style="color:red;">*</text><view class="fill-content"></view>
           <constellationpicker :items.sync="constellationArray"></constellationpicker>
         </view>
         <view class="line" style="margin-top: 15rpx;"></view>
-        <view class="pick-input" style="margin-top: 15rpx;"><text>学历</text><view class="fill-content"></view>
+        <view class="pick-input" style="margin-top: 15rpx;"><text>学历</text><text style="color:red;">*</text><view class="fill-content"></view>
           <educatepicker :items.sync="educateArray"></educatepicker>
         </view>
         <view class="line" style="margin-top: 15rpx;"></view>
-        <view class="pick-input" style="margin-top: 15rpx;"><text>籍贯</text><view class="fill-content"></view>
+        <view class="pick-input" style="margin-top: 15rpx;"><text>籍贯</text><text style="color:red;">*</text><view class="fill-content"></view>
           <picker mode="region" bindchange="bindCity" value="{{region}}">
             <view class="picker">
               <text wx:if="{{region[0] != null && region[0] !==''}}">{{region[0]}} {{region[1]}}</text>
@@ -63,15 +63,15 @@
           </picker>
         </view>
         <view class="line" style="margin-top: 15rpx;"></view>
-        <view class="text-input" style="margin-top: 15rpx;"><text>工作地址</text><view class="fill-content"></view><input value="{{userInfo.workArea}}" bindinput="bindInputValue('workArea')" placeholder="请点击输入"/></view>
+        <view class="text-input" style="margin-top: 15rpx;"><text>工作地址</text><text style="color:red;">*</text><view class="fill-content"></view><input value="{{userInfo.workArea}}" bindinput="bindInputValue('workArea')" placeholder="请点击输入"/></view>
         <view class="line" style="margin-top: 15rpx;"></view>
-        <view class="text-input" style="margin-top: 15rpx;"><text>所在部门</text><view class="fill-content"></view><input value="{{userInfo.department}}" bindinput="bindInputValue('department')" placeholder="请输入部门(xxx-xxx)"/></view>
+        <view class="text-input" style="margin-top: 15rpx;"><text>所在部门</text><text style="color:red;">*</text><view class="fill-content"></view><input value="{{userInfo.department}}" bindinput="bindInputValue('department')" placeholder="请输入部门(xxx-xxx)"/></view>
         <view class="line" style="margin-top: 15rpx;"></view>
-        <view class="pick-input" style="margin-top: 15rpx;"><text>身高(cm)</text><view class="fill-content"></view>
+        <view class="pick-input" style="margin-top: 15rpx;"><text>身高(cm)</text><text style="color:red;">*</text><view class="fill-content"></view>
           <tallpicker :items.sync="tallArray"></tallpicker>
         </view>
         <view class="line" style="margin-top: 15rpx;"></view>
-        <view class="pick-input" style="margin-top: 15rpx;"><text>体重(kg)</text><view class="fill-content"></view>
+        <view class="pick-input" style="margin-top: 15rpx;"><text>体重(kg)</text><text style="color:red;">*</text><view class="fill-content"></view>
           <fatpicker :items.sync="fatArray"></fatpicker>
         </view>
       </view>
@@ -126,6 +126,7 @@
       imageUrl: '',
       userSession: {},
       choosingPhoto: false,
+      guess: false,
       tallArray: {
         items: Array.apply(null, {length: 60}).map(function(value, index){
           return index + 150;
@@ -150,7 +151,7 @@
         date: ''
       },
       userInfo: {
-        name: '1231',
+        name: '',
         sex: 1,
         workArea: null,
         province: null,
@@ -288,18 +289,13 @@
         let submitInfo = {};
         Object.assign(submitInfo, this.userInfo)
         submitInfo.photos = JSON.stringify(this.userInfo.photos)
-        if (this.userSession.level === 'guest') {
+        if (this.guess) {
           console.log("用户新提交信息")
           Util.commonRequest(this.$parent.globalData.backUrl + "user/saveUserInfo", submitInfo, true, this.$parent)
             .then(res => {
               if (res.success) {
                 this.$parent.showSuccessToast("提交成功");
-                let setUserSession = {};
-                Object.assign(setUserSession, this.userSession);
-                setUserSession.level = 'user';
                 this.userInfo.status = 0;
-                wx.setStorageSync(this.$parent.globalData.userInfoSessionKey, setUserSession);
-                wx.setStorageSync(this.$parent.globalData.userInfoStorageKey, this.userInfo)
                 this.$apply();
               }else {
                 this.$parent.showErrorToast(res.message);
@@ -315,8 +311,6 @@
             .then(res => {
               if(res.success) {
                this.$parent.showSuccessToast("更新成功");
-                wx.setStorageSync(this.$parent.globalData.userInfoStorageKey, this.userInfo);
-                // this.userInfo.status = 0;
                 this.$apply();
               }else {
                 this.$parent.showErrorToast(res.message);
@@ -347,13 +341,13 @@
       this.$parent.showCustomLoading("加载中...");
       LoginUtil.getUserInfo(this)
         .then(res => {
-          this.userSession = wx.getStorageSync(this.$parent.globalData.userInfoSessionKey)
           if (res['sex'] == null) {
            this.processLocalUserInfo(res)
           }else {
             res.photos = JSON.parse(res.photos)
             this.userInfo = this.processUserInfo(res);
           }
+          this.$apply();
           wx.hideLoading();
         }).catch(error => Util.processErrorMessage(error, this, false));
     }
@@ -366,7 +360,7 @@
       console.log(userInfo)
       this.userInfo.name = userInfo.nickName;
       this.userInfo.sex = userInfo.gender == 1 ? 0 : 1;
-
+      this.guess = true;
       this.sexArray.itemIndex = this.userInfo.sex;
     }
 
@@ -376,6 +370,7 @@
      * @returns {*}
      */
     processUserInfo(userInfo) {
+      this.guess = false;
       this.sexArray.itemIndex = userInfo.sex;
       this.birthdayDate.date = userInfo.birthday;
       this.constellationArray.itemIndex = userInfo.constellation;

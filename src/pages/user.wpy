@@ -90,10 +90,6 @@
     onShow() {
       // wx.hideTabBar();
       this.$parent.showCustomLoading("加载中...");
-      // 为了更新用户信息的审核状态 一到用户页就删除本地缓存 重新获取
-      if (wx.getStorageSync(this.$parent.globalData.userInfoSessionKey).level != "guest") {
-        wx.removeStorageSync(this.$parent.globalData.userInfoStorageKey);
-      }
 
       LoginUtil.getUserInfo(this,true)
         .then(res => {

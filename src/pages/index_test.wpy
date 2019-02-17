@@ -98,8 +98,6 @@
      */
     loadData(data) {
       this.isError = false;
-      // wx.showTabBar({animation: true});
-      console.log("请求到的数据：", data)
       this.dataList = this.processData(data.dataList);
       this.page.pageIndex += 1;
       this.page.totalPage = data.totalPage;
@@ -126,7 +124,6 @@
           path: `/pages/user_info?openId=${item.openId}`
         }
       })
-      console.log("处理后数据", result)
       return result;
     }
 
@@ -183,24 +180,8 @@
       // 2.登录后开始获取用户信息 其实主要是第一次获取用户信息授权用 然后保存到本地缓存
       // 3.然后请求第一页数据
       // 最后对上述处理中出现异常做异常处理 主要还是处理服务器连接失败问题
-
-      LoginUtil.doLogin(this.$parent)
-        .then(res => {
-          if (res) {
-            return LoginUtil.getUserInfo(this)
-          }else {
-            console.log("登录异常")
-          }
-        })
-        .then(res => {
-          console.log("成功获得用户信息：", res)
-          return res;
-        })
-        .then(res => {
-          console.log("启动首个请求：", res)
-          return Util.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, false, this.$parent);
-        })
-        .then(res => {
+        Util.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, false, this.$parent)
+          .then(res => {
           console.log("成功获得信息:", res)
           this.$invoke("loading", "hideMask");
           this.loadData(res)

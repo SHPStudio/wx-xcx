@@ -17,38 +17,36 @@ export default {
       console.log("获取sessionValue:", sessionValue)
     }else {
       console.log("已存在登录信息")
+      wx.chek
     }
     return true
   },
 
   async getUserInfo(that, useAutorize=true) {
     console.log("开始获取用户信息")
-    let userInfo = wx.getStorageSync(that.$parent.globalData.userInfoStorageKey)
-    if (null == userInfo || userInfo == "") {
-      let userSession = wx.getStorageSync(that.$parent.globalData.userInfoSessionKey)
-      if (null == userSession || userSession == "") {
-        console.log("获取用户信息时没有登录态信息 极少数情况")
-        await this.doLogin(that.$parent)
-        userSession = wx.getStorageSync(that.$parent.globalData.userInfoSessionKey)
-      }
-
-      if (userSession.level == "user") {
-        // 请求服务器获取
-        userInfo = await Util.commonRequest(that.$parent.globalData.backUrl + "user/getUserInfo",null,false, that.$parent);
+    console.log("检查是否有用户信息")
+    let userInfo = await Util.commonRequest(that.$parent.globalData.backUrl + "user/getUserInfo",null,false, that.$parent);
+    console.log("用户信息：", userInfo)
+    if (userInfo == null || userInfo === "") {
+      console.log("没有用户信息，检查是否有授权");
+      // 检查是否授权
+      let isAuthorize = await this.checkAuthorize();
+      if (isAuthorize) {
+        let tempUserInfo = wx.getStorageSync(that.$parent.globalData.userInfoStorageKey);
+        if (tempUserInfo != null && tempUserInfo != "") {
+          console.log("从缓存中读取")
+          return tempUserInfo;
+        }
+        // 已授权静默获取
+        userInfo = await this.getUserInfoSlience()
+        wx.setStorageSync(that.$parent.globalData.userInfoStorageKey, userInfo);
       }else {
-        // 检查是否授权
-        let isAuthorize = await this.checkAuthorize();
-        if (isAuthorize) {
-          // 已授权静默获取
-          userInfo = await this.getUserInfoSlience()
-        }else {
-          // 弹窗授权
-          if (useAutorize) {
-            userInfo = await this.getUserInfoPopModal(that)
-          }
+        // 弹窗授权
+        if (useAutorize) {
+          userInfo = await this.getUserInfoPopModal(that)
+          wx.setStorageSync(that.$parent.globalData.userInfoStorageKey, userInfo);
         }
       }
-      wx.setStorageSync(that.$parent.globalData.userInfoStorageKey, userInfo)
     }
     return userInfo;
   },
@@ -89,13 +87,9 @@ export default {
         success(res) {
           try {
             if (res && res.data) {
-              let userInfo = res.data.userInfo;
               res.data.userInfo = null;
               let sessionValue = res.data;
               wx.setStorageSync(thatParent.globalData.userInfoSessionKey, sessionValue);
-              if (null != userInfo) {
-                wx.setStorageSync(thatParent.globalData.userInfoStorageKey, userInfo)
-              }
               resolve(res.data);
             } else {
               console.log("调用getSessionIdFromServer fail :", res)
