@@ -17,7 +17,6 @@ export default {
       console.log("获取sessionValue:", sessionValue)
     }else {
       console.log("已存在登录信息")
-      wx.chek
     }
     return true
   },
