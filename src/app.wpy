@@ -88,7 +88,7 @@ export default class extends wepy.app {
 
   globalData = {
     userInfo: null,
-    backUrl: 'http://192.168.99.132:8080/',
+    backUrl: 'http://www.shpcoder.cn:8080/',
     imageUrl: 'http://zimg.shpcoder.cn/',
     userInfoStorageKey: "userInfo",
     userInfoSessionKey: "sessionkey",
