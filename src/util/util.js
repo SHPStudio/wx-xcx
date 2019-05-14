@@ -18,7 +18,7 @@ export default {
       this.showCustomLoading("玩儿命加载中")
     }
     let result = await this.request(url, data);
-
+    // 没有登陆的话就会清除缓存重新登陆
     if (result === 'notlogin') {
       console.log("没有登录")
       wx.removeStorageSync(thatParent.globalData.userInfoSessionKey);

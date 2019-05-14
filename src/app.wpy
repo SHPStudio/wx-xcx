@@ -10,7 +10,7 @@
   padding-top: 10rpx;
 }
   page {
-    background: #f7f7f7;
+    background: white;
   }
 
   .fill-content {
@@ -21,7 +21,7 @@
 .line {
   width: 100%;
   height: 3rpx;
-  background: #dedede;
+  background: white;
 }
 .menu {
   background: #fff;
@@ -52,20 +52,28 @@ export default class extends wepy.app {
     ],
     window: {
       backgroundTextStyle: 'dark',
-      navigationBarBackgroundColor: '#17233d',
+      navigationBarBackgroundColor: '#FFFFFF',
       navigationBarTitleText: 'WeChat',
-      navigationBarTextStyle: 'white',
-      backgroundColor: "#f7f7f7",
+      navigationBarTextStyle: 'black',
+      backgroundColor: "#FFFFFF",
     },
     tabBar: {
       selectedColor: "#353535",
       color: "#888888",
+      backgroundColor: "white",
+      fontSize:"12px",
       list: [
         {
           pagePath: "pages/index_test",
           text: "首页",
           selectedIconPath: "image/home1.png",
           iconPath: 'image/home2.png'
+        },
+        {
+          pagePath: "pages/message",
+          text: "活动",
+          selectedIconPath: "image/message1.png",
+          iconPath: 'image/message2.png'
         },
         {
           pagePath: "pages/message",
@@ -88,7 +96,7 @@ export default class extends wepy.app {
 
   globalData = {
     userInfo: null,
-    backUrl: 'http://www.shpcoder.cn:8080/',
+    backUrl: 'http://shape.shpcoder.cn/',
     imageUrl: 'http://zimg.shpcoder.cn/',
     userInfoStorageKey: "userInfo",
     userInfoSessionKey: "sessionkey",
