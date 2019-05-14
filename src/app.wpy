@@ -71,12 +71,6 @@ export default class extends wepy.app {
         },
         {
           pagePath: "pages/message",
-          text: "活动",
-          selectedIconPath: "image/message1.png",
-          iconPath: 'image/message2.png'
-        },
-        {
-          pagePath: "pages/message",
           text: "消息",
           selectedIconPath: "image/message1.png",
           iconPath: 'image/message2.png'
@@ -96,7 +90,7 @@ export default class extends wepy.app {
 
   globalData = {
     userInfo: null,
-    backUrl: 'http://www.shpcoder.cn:8080/',
+    backUrl: 'http://shape.shpcoder.cn/',
     imageUrl: 'http://zimg.shpcoder.cn/',//亮点：：开源的图片服务器   C语言写的
     userInfoStorageKey: "userInfo",
     userInfoSessionKey: "sessionkey",

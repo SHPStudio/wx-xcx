@@ -70,12 +70,12 @@
 </style>
 <template>
     <view class="container" >
-      <!--  &lt;!&ndash;列表&ndash;&gt;
+        <!--列表-->
         <repeat for="{{dataList}}" index="index" item="item" key="key">
-          &lt;!&ndash;列表单条记录&ndash;&gt;
+          <!--列表单条记录-->
           <single :item="item"></single>
-        </repeat>-->
-      <scroll-view class="user-card"  bindtouchend="touchEnd"
+        </repeat>
+     <!-- <scroll-view class="user-card"  bindtouchend="touchEnd"
                    bindtouchstart="touchStart" bindtouchmove="touchMove">
           <image src="../image/rpg.jpg" class="user-card-img"></image>
           <view>
@@ -102,8 +102,8 @@
         </scroll-view>
       <view class="show-follow-icon">
         <image src="../image/icon/心.png"></image>
-      </view>
-      <!--<loadmore :more.sync="more"></loadmore>-->
+      </view>-->
+      <loadmore :more.sync="more"></loadmore>
     </view>
     <loading></loading>
 </template>

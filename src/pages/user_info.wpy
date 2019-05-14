@@ -18,6 +18,7 @@
           <view class="fill-content"></view>
           <image @tap="wxNumClick" class="wx" src="/image/usericon/wx.png" wx:if="{{userInfo.allAttention && userInfo.attention}}"></image>
           <image @tap="attentionClick" class="xin" src="{{userInfo.attention ? '/image/usericon/xinfill.png' : '/image/usericon/xin.png'}}"></image>
+          <image src="/image/icon/report.png" style="width:30px;height:30px;" @tap="reportUser"></image>
         </view>
 
         <!--性别信息-->
@@ -40,10 +41,22 @@
             <homeStatusExtInfo title="家庭情况" :text.sync="familyCom"></homeStatusExtInfo>
             <friendStandardExtInfo title="交友标准" :text.sync="standFriendCom"></friendStandardExtInfo>
         </view>
+        <!--jubao-->
+        <view class="report_dialog" wx:if="{{isShow}}">
+           <view class="title">举报</view>
+          <radio-group class="radio-group" bindchange="radioChange">
+            <label class="radio" wx:for="{{k7}}" wx:key="index">
+              <radio value="{{item.arr_guige02}}" bindtap='radio' data-id="{{item.guige_key02}}" checked="{{item.checked}}"/>{{item.arr_guige02}}
+            </label>
+          </radio-group>
+          <view class="text">被举报人：{{userInfo.name}}</view>
+          <button style="margin-top:20px;" @tap="cancelReport">取消</button><button @tap="submitReport">提交</button>
+        </view>
       </view>
     </view>
   <loading></loading>
 </template>
+
 
 <script>
   import wepy from 'wepy'
@@ -78,8 +91,19 @@
       width: width,
       openId:"",
       imageUrl:"",
-      wxNumber:""
-    }
+      wxNumber:"",
+      k7:[
+        {
+          arr_guige02:"涉黄",
+          guige_key02:0
+        },
+        {
+          arr_guige02:"言语粗俗",
+          guige_key02:1
+        }
+      ],
+      isShow:false
+    };
     computed = {
       sexCom() {
         return this.userInfo.sex;
@@ -129,6 +153,31 @@
     }
 
     methods = {
+      //举报用户
+      reportUser(){
+        console.log("举报");
+        this.isShow = true;
+      },
+      submitReport(){
+        this.isShow = false;
+      },
+      cancelReport(){
+        this.isShow = false;
+      },
+      // 获取该组件的id
+      radio:function(e){
+        this.setData({
+          guige_key02: e.currentTarget.dataset.id
+        })
+        console.log(e.currentTarget.dataset.id)
+      },
+      // 发货地址选择,获取用户选择的单选框的值
+      radioChange: function (e) {
+        this.setData({
+          arr_guige02: e.detail.value
+        })
+        console.log(e.detail.value)
+      },
       lookImage(index) {
         let currentImage =  this.imageUrl + this.userInfo.photoList[index];
         let imageList = this.userInfo.photoList.map(x => this.imageUrl + x)
@@ -241,6 +290,37 @@
 <style lang="less">
   .user-info {
     padding-top: 0;
+  }
+  .report_dialog{
+    position:absolute;
+    top:25vh;
+    left:10vw;
+    width:80vw;
+    height:30vh;
+    background-color:white;
+    color:#000;
+    border-radius:10px 4px;
+    .title{
+      padding: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      border-bottom: 1px solid lavender;
+    }
+    .radio{
+      padding:10px;
+      font-size:15px;
+    }
+    .text{
+      padding:10px;
+      font-size:15px;
+    }
+    button{
+      margin:20px ;
+      width:21%;
+      font-size:13px;
+      display:inline-block;
+      text-align: right;
+    }
   }
   .user-info-content {
     margin-top: 20rpx;
