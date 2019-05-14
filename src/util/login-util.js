@@ -11,8 +11,10 @@ export default {
     let userSession = wx.getStorageSync(thatParent.globalData.userInfoSessionKey)
     console.log("session", userSession);
     if (null == userSession || userSession == "") {
+      // 从微信获取code
       const code = await this.getCodeFromWx();
       console.log("获取code" + code);
+      // 吧code传给开发服务器
       const sessionValue = await this.getSessionIdFromServer(code, thatParent)
       console.log("获取sessionValue:", sessionValue)
     }else {
