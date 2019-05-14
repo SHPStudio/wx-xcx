@@ -5,7 +5,7 @@ export default {
     config (p) {
       // 对所有request请求中的OBJECT参数对象统一附加时间戳属性
       let url = p.url;
-      if (!url.includes("login")) {
+      if (!url.includes("login")) {//登录是要获取登录信息，其他的时候已经处于登陆状态了，不需要在获取，如果url有登录信息就
         let session = wx.getStorageSync(this.globalData.userInfoSessionKey);
         console.log(session)
         p.header = {sessionId: session.sessionId}

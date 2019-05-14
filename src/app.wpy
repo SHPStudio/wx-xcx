@@ -89,7 +89,7 @@ export default class extends wepy.app {
   globalData = {
     userInfo: null,
     backUrl: 'http://www.shpcoder.cn:8080/',
-    imageUrl: 'http://zimg.shpcoder.cn/',
+    imageUrl: 'http://zimg.shpcoder.cn/',//亮点：：开源的图片服务器   C语言写的
     userInfoStorageKey: "userInfo",
     userInfoSessionKey: "sessionkey",
     sexList: [
@@ -116,25 +116,27 @@ export default class extends wepy.app {
       "博士"
     ]
   }
-
+//初始化函数（import的一些拦截器之类的初始化）
   constructor () {
     super()
     this.use('requestfix');
     this.showCustomLoading = CustomUtil.showCustomLoading;
     this.showErrorToast = CustomUtil.showErrorToast;
     this.showSuccessToast = CustomUtil.showSuccessToast;
+    //拦截微信登录的一些拦截（微信API）
     this.intercept('login', Interceptors.login);
     this.intercept('request', Interceptors.request);
     this.intercept('uploadFile', Interceptors.uploadFile);
   }
-
+//判断登录是否生效
   async onLaunch() {
     console.log("qidong");
     // wx.hideTabBar();
     wx.showTabBarRedDot({
       index: 1,
     })
-    wx.removeStorageSync(this.globalData.userInfoStorageKey);
+    wx.removeStorageSync(this.globalData.userInfoStorageKey);//清除本地写用户信息
+    //判断缓存是否过期
     let flag = await CustomUtil.checkSession();
     if (!flag) {
       console.log("缓存失效");
