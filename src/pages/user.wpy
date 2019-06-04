@@ -1,34 +1,64 @@
 <!--用户页-->
 <style lang="less">
-  .report_dialog{
+  .tag_dialog{
+    z-index:101;
     position:absolute;
-    top:25vh;
-    left:10vw;
-    width:80vw;
-    height:30vh;
+    top:10vh;
+    left:5vw;
+    width:90vw;
+    height:80vh;
     background-color:white;
     color:#000;
     border-radius:10px 4px;
     .title{
       padding: 10px;
+      margin-bottom: 1vh;
       font-size: 16px;
       font-weight: bold;
       border-bottom: 1px solid lavender;
+      height:5vh;
+      line-height:5vh;
     }
     .radio{
       padding:10px;
-      font-size:15px;
+      font-size:13px;
+      margin: 10px 0;
     }
     .text{
       padding:10px;
       font-size:15px;
     }
     button{
-      margin:20px ;
-      width:21%;
-      font-size:13px;
       display:inline-block;
-      text-align: right;
+      text-align:center;
+    }
+    input{
+      border-bottom:1px solid rgba(0, 0, 0, 0.1);
+      margin:5px 10px 20px 10px;
+      font-size: 14px;
+      padding: 5px;
+    }
+    .tag-group{
+      margin:20px 5vw;
+      border-bottom:1px solid rgba(0, 0, 0, 0.1);
+      padding:0 0 15px 0;
+    }
+    .show_button{
+      margin:3px;
+      font-size:13px;
+      color:white;
+      background-color:rgba(255,165,0,1);
+      border:1px solid coral;
+      border-radius:20px;
+    }
+    .submit-button{
+      font-size:14px;
+      margin:0 20px;
+      text-align:center;
+      button{
+        margin:0 5px;
+        font-size:14px;
+      }
     }
   }
   .user-info {
@@ -41,6 +71,16 @@
     border-bottom-left-radius:100px;
     background-color:#ff9900;
 
+  }
+  .mask{
+    width:100%;
+    height:100%;
+    position:fixed;
+    background-color:#999;
+    z-index:100;
+    top:0;
+    left:0;
+    opacity:0.5;
   }
   .user-info image {
     width: 200rpx;
@@ -65,21 +105,20 @@
     margin: 10px;
     text-align: center;
     .show_button{
-      width:22vw;
       margin-right:10px;
-      height:6vh;
-      color:orange;
-      background-color:rgba(212, 233, 223, 0.1);
+      color:white;
+      background-color:#ffa500;
       border:1px solid coral;
       font-size:13px;
       display:inline-block;
-      font-weight:bold;
-    }
+      border-radius:15px;
 
+    }
   }
 </style>
 <template>
   <view class="container" style="padding-top: 0">
+    <view class="mask" wx:if="{{showModal}}"></view>
     <!--用户页展示-->
     <div style="width: 100%">
       <!--头像条-->
@@ -95,12 +134,24 @@
       <view class="menu">
           <menu :menulist="menuList"></menu>
       </view>
-      <!--jubao-->
-      <view class="report_dialog" wx:if="{{isShow}}">
+      <!--tag-->
+      <view class="tag_dialog" wx:if="{{showModal}}">
         <view class="title">选择标签</view>
-        <input value="{{tagValue}}"/>
-        <button class="show_button" wx:for="{{tagList}}" wx:key="index" @tap="chooseTag">{{item}}</button>
-        <button class="show_button" @tap="submitTag">完成</button>
+        <text style="font-size: 14px;margin:5px 10px;">选择标签类型...</text>
+        <radio-group class="radio-group" bindchange="radioChange">
+          <label class="radio" wx:for="{{tagTypeList}}" wx:key="index">
+            <radio value="{{item.tagTypeValue}}" bindtap='radio' data-id="{{item.tagType}}" checked="{{item.checked}}"/>{{item.tagTypeValue}}
+          </label>
+        </radio-group>
+        <input value="{{tagValue}}" placeholder="请输入要添加的标签..."/>
+        <view class="tag-group">
+          <text style="font-size: 14px;margin:5px 10px;display: block">供选择标签...</text>
+          <button class="show_button" wx:for="{{tagList}}" wx:key="index" @tap="chooseTag">{{item}}</button>
+        </view>
+        <view class="submit-button">
+            <button class="" @tap="cancelTag">取消</button>
+            <button class="" @tap="submitTag">完成</button>
+        </view>
       </view>
     </div>
   </view>
@@ -125,18 +176,32 @@
 
 
     data = {
+      showModal:false,
+      tagValue:"",
+      tagTypeList:[
+        {
+          tagTypeValue:"正在做...",
+          tagType:0
+        },
+        {
+          tagTypeValue:"打算做...",
+          tagType:1
+        },
+        {
+          tagTypeValue:"我的活动",
+          tagType:2
+        }
+      ],
       userInfo: {
         avatarUrl: '',
         nickName: 'shape',
-        status: null,
-        isShow:false,
-        tagValue:""
+        status: null
       },
       tagList:[
-        '爱学习',"爱健身", '爱学习',"爱健身", '爱学习',"爱健身", '爱学习',"爱健身", '爱学习',"爱健身", '爱学习',"爱健身", '爱学习',"爱健身", '爱学习',"爱健身", '爱学习',"爱健身",
+        '学习',"健身", '游戏爱好者',"王者荣耀", 'LOL',"IT程序员", '学霸',"绘画", '电脑发烧友',"手机控", '爱学习',"看电影", '听音乐',"爱健身", '爱学习',"爱健身", '爱学习',"爱健身",
       ],
       myTag:[
-        '爱学习',"爱健身"
+        '测试中。。。',"开发"
       ],
       menuList:{
         list:  [
@@ -144,19 +209,30 @@
           {url: "/image/about.png", text: "关于", path: "/pages/index"}
         ]
       }
-    }
+    };
     methods = {
       addTag(){
-        this.isShow = true;
-      },
-      chooseTag(){
-
+          this.showModal = true
       },
       submitTag(){
-        this.isShow = false;
+          this.showModal = false
       },
-      closeTag(){
-        this.isShow = false;
+      cancelTag(){
+        this.showModal = false
+      },
+      // 获取该组件的id
+      radio:function(e){
+        this.setData({
+          tagType: e.currentTarget.dataset.id
+        })
+        console.log(e.currentTarget.dataset.id)
+      },
+      // 发货地址选择,获取用户选择的单选框的值
+      radioChange: function (e) {
+        this.setData({
+          tagTypeValue: e.detail.value
+        })
+        console.log(e.detail.value)
       },
       /**
        * 点击头像条跳到编辑信息页面
@@ -166,8 +242,7 @@
           url: "/pages/user_set_info"
         })
       }
-    }
-
+    };
     onShow() {
       // wx.hideTabBar();
       this.$parent.showCustomLoading("加载中...");

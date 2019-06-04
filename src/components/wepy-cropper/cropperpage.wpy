@@ -2,16 +2,19 @@
   <view class="mess {{showModal ? 'open-display' : 'close-display'}}">
     <view class="cropper-buttons">
       <cropper :options="cropperOpt"></cropper>
-      <view
-        class="upload"
-        @tap="closeCropperPage()">
-        取消
-      </view>
-      <view
+      <view class="img-button">
+        <button
+          class="upload"
+          @tap="closeCropperPage()">
+          取消
+        </button>
+        <button
         class="getCropperImage"
         @tap="getCropperImage">
         完成
+      </button>
       </view>
+
     </view>
   </view>
 </template>
@@ -97,5 +100,15 @@
   }
   .close-display {
     display: none;
+  }
+  .img-button{
+    margin: 10px;
+    text-align: center;
+    button{
+      display:inline-block;
+      font-size:15px;
+      margin:0 5px;
+
+    }
   }
 </style>

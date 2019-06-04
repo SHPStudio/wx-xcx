@@ -1,6 +1,7 @@
 <!--用户信息展示详情页-->
 <template>
     <view class="container user-info">
+      <view class="mask" wx:if="{{isShow}}"></view>
       <!--用户照片-->
       <view class="user-image" style="width: {{width}}px; height: {{width}}px;">
         <swiper indicator-dots="true" duration="200" style="width: {{width}}px; height: {{width}}px;">
@@ -50,7 +51,9 @@
             </label>
           </radio-group>
           <view class="text">被举报人：{{userInfo.name}}</view>
-          <button style="margin-top:20px;" @tap="cancelReport">取消</button><button @tap="submitReport">提交</button>
+          <view style="text-align: center">
+            <button style="margin-top:20px;" @tap="cancelReport">取消</button><button @tap="submitReport">提交</button>
+          </view>
         </view>
       </view>
     </view>
@@ -292,6 +295,7 @@
     padding-top: 0;
   }
   .report_dialog{
+    z-index: 101;
     position:absolute;
     top:25vh;
     left:10vw;
@@ -305,6 +309,9 @@
       font-size: 16px;
       font-weight: bold;
       border-bottom: 1px solid lavender;
+      height: 5vh;
+      line-height: 5vh;
+      margin-bottom: 10px;
     }
     .radio{
       padding:10px;
@@ -313,6 +320,7 @@
     .text{
       padding:10px;
       font-size:15px;
+      border-bottom: 1px solid lavender;
     }
     button{
       margin:20px ;
@@ -321,6 +329,16 @@
       display:inline-block;
       text-align: right;
     }
+  }
+  .mask{
+    width:100%;
+    height:100%;
+    position:fixed;
+    background-color:#999;
+    z-index:100;
+    top:0;
+    left:0;
+    opacity:0.5;
   }
   .user-info-content {
     margin-top: 20rpx;

@@ -6,6 +6,7 @@ export default {
    * 执行登录计划
    * @returns {Promise<void>}
    */
+  //登录计划
   async doLogin(thatParent) {
     console.log("进行登录", thatParent);
     let userSession = wx.getStorageSync(thatParent.globalData.userInfoSessionKey)
