@@ -52,7 +52,7 @@
           </radio-group>
           <view class="text">被举报人：{{userInfo.name}}</view>
           <view style="text-align: center">
-            <button style="margin-top:20px;" @tap="cancelReport">取消</button><button @tap="submitReport">提交</button>
+            <button style="" @tap="cancelReport">取消</button><button @tap="submitReport">提交</button>
           </view>
         </view>
       </view>
@@ -98,11 +98,19 @@
       k7:[
         {
           arr_guige02:"涉黄",
-          guige_key02:0
+          guige_key02:1
         },
         {
-          arr_guige02:"言语粗俗",
-          guige_key02:1
+          arr_guige02:"恶意骚扰",
+          guige_key02:2
+        },
+        {
+          arr_guige02:"盗用图片",
+          guige_key02:3
+        },
+        {
+          arr_guige02:"其他",
+          guige_key02:4
         }
       ],
       isShow:false
@@ -300,7 +308,7 @@
     top:25vh;
     left:10vw;
     width:80vw;
-    height:30vh;
+    max-height:60vh;
     background-color:white;
     color:#000;
     border-radius:10px 4px;
@@ -323,7 +331,8 @@
       border-bottom: 1px solid lavender;
     }
     button{
-      margin:20px ;
+      margin-top: 5px;
+      margin-right: 25px;
       width:21%;
       font-size:13px;
       display:inline-block;

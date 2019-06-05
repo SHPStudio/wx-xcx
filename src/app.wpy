@@ -90,7 +90,7 @@ export default class extends wepy.app {
 
   globalData = {
     userInfo: null,
-    backUrl: 'http://shape.shpcoder.cn/',
+    backUrl: 'http://localhost:8080/',
     imageUrl: 'http://zimg.shpcoder.cn/',//亮点：：开源的图片服务器   C语言写的
     userInfoStorageKey: "userInfo",
     userInfoSessionKey: "sessionkey",
@@ -120,7 +120,7 @@ export default class extends wepy.app {
   }
 //初始化函数（import的一些拦截器之类的初始化）
   constructor () {
-    super()
+    super();
     this.use('requestfix');
     this.showCustomLoading = CustomUtil.showCustomLoading;
     this.showErrorToast = CustomUtil.showErrorToast;

@@ -138,11 +138,6 @@
           code: {},
           user: {}
         },
-        page: {
-          pageIndex: 1,
-          pageSize: 5,
-          totalPage: 1
-        },
         noData: false,
         load:true,
         isError: false,
@@ -154,7 +149,7 @@
       left:"0",
       startX:'',
       endX:'',
-
+      size: 5
     };
 
     methods = {
@@ -178,17 +173,11 @@
      */
     onPullDownRefresh() {
       console.log("下拉刷新")
-
-      if (this.page.pageIndex > this.page.totalPage) {
-        wx.showToast({title:"帅哥美女库存已空，来推荐几个吧", icon: "none"})
+      Util.commonRequest(this.$parent.globalData.backUrl + "user/randomQueryUserInfo?size=" + this.size,null, false, this.$parent)
+        .then(res => this.topLoadData(res)).catch(error => {
         wx.stopPullDownRefresh();
-      }else {
-        Util.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, false, this.$parent)
-          .then(res => this.topLoadData(res)).catch(error => {
-             wx.stopPullDownRefresh();
-             Util.processErrorMessage(error, this, false);
-        })
-      }
+        Util.processErrorMessage(error, this, false);
+      })
     }
 
     /**
@@ -196,12 +185,8 @@
      */
     onReachBottom() {
       console.log("上拉刷新")
-      if (this.page.pageIndex > this.page.totalPage) {
-        this.more.type = false;
-      }else {
-        Util.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, false, this.$parent)
-          .then(res => this.downLoadData(res)).catch(error => Util.processErrorMessage(error, this, false))
-      }
+      Util.commonRequest(this.$parent.globalData.backUrl + "user/randomQueryUserInfo?size=" + this.size,null, false, this.$parent)
+        .then(res => this.downLoadData(res)).catch(error => Util.processErrorMessage(error, this, false))
     }
 
     /**
@@ -210,9 +195,7 @@
      */
     loadData(data) {
       this.isError = false;
-      this.dataList = this.processData(data.dataList);
-      this.page.pageIndex += 1;
-      this.page.totalPage = data.totalPage;
+      this.dataList = this.processData(data);
       this.$apply();
     }
 
@@ -223,6 +206,7 @@
      */
     processData(dataList) {
       let _this = this;
+      console.log("processData", dataList);
       let result = dataList.map(item => {
         return {
           openId: item.openId,
@@ -235,7 +219,8 @@
           constellation: _this.$parent.globalData.constellationList[item.constellation],
           path: `/pages/user_info?openId=${item.openId}`
         }
-      })
+      });
+      console.log("processData result", result);
       return result;
     }
 
@@ -257,11 +242,15 @@
      * @param data
      */
     topLoadData(data) {
+      if (!data || data.length == 0) {
+        wx.showToast({title:"帅哥美女库存已空，来推荐几个吧", icon: "none"})
+        wx.stopPullDownRefresh();
+        return;
+      }
       console.log("上拉刷新请求到的数据：", data);
-      wx.stopPullDownRefresh();
-      this.dataList.unshift(this.processData(data.dataList));
-      this.page.pageIndex += 1;
-      this.page.totalPage = data.totalPage;
+      this.processData(data).forEach(e => {
+        this.dataList.unshift(e);
+      });
       this.$apply();
     }
 
@@ -271,9 +260,9 @@
      */
     downLoadData(data) {
       console.log("下拉刷新请求到的数据：", data);
-      this.dataList.push(this.processData(data.dataList));
-      this.page.pageIndex += 1;
-      this.page.totalPage = data.totalPage;
+      this.processData(data).forEach(e => {
+        this.dataList.push(e)
+      });
       this.$apply();
     }
 
@@ -292,7 +281,7 @@
       // 2.登录后开始获取用户信息 其实主要是第一次获取用户信息授权用 然后保存到本地缓存
       // 3.然后请求第一页数据
       // 最后对上述处理中出现异常做异常处理 主要还是处理服务器连接失败问题
-        Util.commonRequest(this.$parent.globalData.backUrl + "user/queryByPage", this.page, false, this.$parent)
+        Util.commonRequest(this.$parent.globalData.backUrl + "user/randomQueryUserInfo?size=" + this.size,null, false, this.$parent)
           .then(res => {
           console.log("成功获得信息:", res)
           this.$invoke("loading", "hideMask");
