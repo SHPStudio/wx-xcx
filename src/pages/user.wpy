@@ -127,8 +127,11 @@
         <text>{{userInfo.nickName}}</text>
       </view>
       <view class="show_tag">
-        <button class="show_button"  wx:for="{{myTag}}" wx:key="index">{{item}}</button>
-        <button class="show_button" wx:if="{{myTag.length <= 2}}" @tap="addTag">添加标签</button>
+        <!--<button class="show_button"  wx:for="{{myTag}}" wx:key="index">{{item}}</button>-->
+        <button class="show_button" @tap="addTag" data-id="1">正在..{{doingTag}}</button>
+        <button class="show_button" @tap="addTag" data-id="2">打算..{{planTag}}</button>
+        <button class="show_button" @tap="addTag" data-id="3">活动..{{activityTag}}</button>
+        <!--<button class="show_button" wx:if="{{myTag.length <= 2}}" @tap="addTag">添加标签</button>-->
       </view>
       <!--菜单-->
       <view class="menu">
@@ -137,16 +140,16 @@
       <!--tag-->
       <view class="tag_dialog" wx:if="{{showModal}}">
         <view class="title">选择标签</view>
-        <text style="font-size: 14px;margin:5px 10px;">选择标签类型...</text>
-        <radio-group class="radio-group" bindchange="radioChange">
-          <label class="radio" wx:for="{{tagTypeList}}" wx:key="index">
-            <radio value="{{item.tagTypeValue}}" bindtap='radio' data-id="{{item.tagType}}" checked="{{item.checked}}"/>{{item.tagTypeValue}}
-          </label>
-        </radio-group>
-        <input value="{{tagValue}}" placeholder="请输入要添加的标签..."/>
+        <!--<text style="font-size: 14px;margin:5px 10px;">选择标签类型...</text>-->
+        <!--<radio-group class="radio-group" bindchange="radioChange">-->
+          <!--<label class="radio" wx:for="{{tagTypeList}}" wx:key="index">-->
+            <!--<radio value="{{item.tagType}}" bindtap='radio' data-id="{{item.tagType}}" checked="{{item.checked}}"/>{{item.tagTypeValue}}-->
+          <!--</label>-->
+        <!--</radio-group>-->
+        <input value="{{tagValue}}" bindinput="handleInput" placeholder="请输入要添加的标签..."/>
         <view class="tag-group">
           <text style="font-size: 14px;margin:5px 10px;display: block">供选择标签...</text>
-          <button class="show_button" wx:for="{{tagList}}" wx:key="index" @tap="chooseTag">{{item}}</button>
+          <button class="show_button" wx:for="{{tagList}}" wx:key="index" data-item="{{item}}" @tap="chooseTag">{{item.tagName}}</button>
         </view>
         <view class="submit-button">
             <button class="" @tap="cancelTag">取消</button>
@@ -178,18 +181,24 @@
     data = {
       showModal:false,
       tagValue:"",
+      tagType: null,
+      doingTag: "",
+      planTag: "",
+      activityTag: "",
       tagTypeList:[
         {
           tagTypeValue:"正在做...",
-          tagType:0
+          tagType:1,
+          checked: true
+
         },
         {
           tagTypeValue:"打算做...",
-          tagType:1
+          tagType:2
         },
         {
           tagTypeValue:"我的活动",
-          tagType:2
+          tagType:3
         }
       ],
       userInfo: {
@@ -197,9 +206,12 @@
         nickName: 'shape',
         status: null
       },
-      tagList:[
-        '学习',"健身", '游戏爱好者',"王者荣耀", 'LOL',"IT程序员", '学霸',"绘画", '电脑发烧友',"手机控", '爱学习',"看电影", '听音乐',"爱健身", '爱学习',"爱健身", '爱学习',"爱健身",
-      ],
+      tagQuery: {
+        tagType: 1,
+        size: 5
+      },
+      realUserInfo: null,
+      tagList:[],
       myTag:[
         '测试中。。。',"开发"
       ],
@@ -211,28 +223,47 @@
       }
     };
     methods = {
-      addTag(){
-          this.showModal = true
+      addTag(e){
+        this.tagType = e.currentTarget.dataset.id;
+        this.randomQueryTag();
+        this.showModal = true
+      },
+      handleInput(e) {
+        this.tagValue = e.detail.value;
       },
       submitTag(){
-          this.showModal = false
+        if ( this.tagValue == null ||this.tagValue === "") {
+          wx.showToast({'title': "标签名字不能为空！", duration: 2000, icon: "none"});
+          return;
+        }
+        Util.commonRequest(this.$parent.globalData.backUrl + "user/addCustomTag", {tagType: this.tagType, tagName: this.tagValue})
+          .then(res=> {
+            if (res && res.success) {
+              this.showModal = false;
+              this.tagList = [];
+              this.tagValue = "";
+              this.loadUserInfo();
+            }else {
+              wx.showToast({'title': res.message ? res.message : "异常，请稍后重试！", duration: 2000, icon: "none"});
+            }
+          }).catch(error => Util.processErrorMessage(error, this, false))
       },
       cancelTag(){
-        this.showModal = false
+        this.showModal = false;
+        this.tagList = [];
+        this.tagValue = "";
       },
       // 获取该组件的id
-      radio:function(e){
-        this.setData({
-          tagType: e.currentTarget.dataset.id
-        })
-        console.log(e.currentTarget.dataset.id)
-      },
+      // radio:function(e){
+      //   this.tagType = e.currentTarget.dataset.id;
+      //   console.log(e.currentTarget.dataset.id);
+      //
+      // },
       // 发货地址选择,获取用户选择的单选框的值
       radioChange: function (e) {
-        this.setData({
-          tagTypeValue: e.detail.value
-        })
-        console.log(e.detail.value)
+        console.log(e);
+        this.tagType = e.detail.value;
+        this.randomQueryTag();
       },
       /**
        * 点击头像条跳到编辑信息页面
@@ -241,9 +272,39 @@
         wx.navigateTo({
           url: "/pages/user_set_info"
         })
+      },
+      chooseTag(e) {
+        let item = e.currentTarget.dataset.item;
+        Util.commonRequest(this.$parent.globalData.backUrl + "user/addUserTag", item)
+          .then(res => {
+            if (res && res.success) {
+              this.showModal = false;
+              this.tagList = [];
+              this.tagValue = "";
+              this.loadUserInfo();
+            }else {
+              wx.showToast({'title': res.message ? res.message : "异常，请稍后重试！", duration: 2000, icon: "none"});
+            }
+          })
+          .catch(error => Util.processErrorMessage(error, this, false))
+        console.log(item);
       }
     };
-    onShow() {
+    // 随机查询标签
+    randomQueryTag() {
+      this.tagQuery.tagType = this.tagType;
+      Util.commonRequest(this.$parent.globalData.backUrl + "user/randomQueryTags?size=" + this.tagQuery.size + "&tagType=" + this.tagQuery.tagType)
+        .then(res => {
+          console.log(res);
+          if (res && res.success) {
+            this.tagList = res.data;
+            this.$apply();
+          }
+        })
+        .catch(error => Util.processErrorMessage(error, this, false))
+    }
+
+    loadUserInfo() {
       // wx.hideTabBar();
       this.$parent.showCustomLoading("加载中...");
 
@@ -252,12 +313,50 @@
           console.log("用户页已有授权信息", res)
           this.userInfo.avatarUrl = res.avatarUrl == null ? this.$parent.globalData.imageUrl + JSON.parse(res.photos)[0] : res.avatarUrl;
           this.userInfo.nickName = res.nickName == null ? res.name: res.nickName;
+          if (!res.nickName) {
+            this.realUserInfo = res;
+            this.processTag();
+          }
           this.$apply();
           wx.hideLoading();
         }).catch(error => {
-          wx.hideLoading();
-          Util.processErrorMessage(error, this)
-        })
+        wx.hideLoading();
+        Util.processErrorMessage(error, this)
+      })
+    }
+
+    processTag() {
+      if (this.realUserInfo.doingTags != null) {
+        Util.commonRequest(this.$parent.globalData.backUrl + "user/queryTag?tagId=" + this.realUserInfo.doingTags)
+          .then(res => {
+            if (res) {
+              this.doingTag = res.tagName;
+              this.$apply();
+            }
+          });
+      }
+      if (this.realUserInfo.planTags != null) {
+        Util.commonRequest(this.$parent.globalData.backUrl + "user/queryTag?tagId=" + this.realUserInfo.planTags)
+          .then(res => {
+            if (res) {
+              this.planTag = res.tagName;
+              this.$apply();
+            }
+          });
+      }
+      if (this.realUserInfo.activityTags != null) {
+        Util.commonRequest(this.$parent.globalData.backUrl + "user/queryTag?tagId=" + this.realUserInfo.activityTags)
+          .then(res => {
+            if (res) {
+              this.activityTag = res.tagName;
+              this.$apply();
+            }
+          });
+      }
+    }
+
+    onShow() {
+      this.loadUserInfo()
     }
   }
 </script>

@@ -27,6 +27,12 @@
           <sexinfo :sex.sync="sexCom" :text.sync="ageCom"></sexinfo>
         </view>
 
+        <view class="show_tag">
+          <button class="show_button" wx:if="{{userInfo.doingTagsDesc}}">正在..{{userInfo.doingTagsDesc}}</button>
+          <button class="show_button" wx:if="{{userInfo.planTagsDesc}}">打算..{{userInfo.planTagsDesc}}</button>
+          <button class="show_button" wx:if="{{userInfo.activityTagsDesc}}">活动..{{userInfo.activityTagsDesc}}</button>
+        </view>
+
         <!--用户基本信息-->
         <view class="user-info-base">
           <positionInfo icon="/image/usericon/position.png" :text.sync="jiguanCom"></positionInfo>
@@ -47,7 +53,7 @@
            <view class="title">举报</view>
           <radio-group class="radio-group" bindchange="radioChange">
             <label class="radio" wx:for="{{k7}}" wx:key="index">
-              <radio value="{{item.arr_guige02}}" bindtap='radio' data-id="{{item.guige_key02}}" checked="{{item.checked}}"/>{{item.arr_guige02}}
+              <radio value="{{item.guige_key02}}" bindtap='radio' data-id="{{item.guige_key02}}" checked="{{item.checked}}"/>{{item.arr_guige02}}
             </label>
           </radio-group>
           <view class="text">被举报人：{{userInfo.name}}</view>
@@ -95,6 +101,7 @@
       openId:"",
       imageUrl:"",
       wxNumber:"",
+      reportType: null,
       k7:[
         {
           arr_guige02:"涉黄",
@@ -170,6 +177,20 @@
         this.isShow = true;
       },
       submitReport(){
+        console.log( this);
+        Util.commonRequest(
+          this.$parent.globalData.backUrl + "user/report",
+          { reportOpenId: this.userInfo.openId, reportType:  this.reportType},
+          false,
+          this.$parent
+        ).then(res => {
+          if (res && res.success) {
+            let message = "举报成功";
+            this.$parent.showErrorToast(message);
+          }else {
+            this.$parent.showErrorToast(res.message == null || res.message === "" ? "举报失败,请稍后重试!" : res.message);
+          }
+        }).catch(error => Util.processErrorMessage(error, this, false));
         this.isShow = false;
       },
       cancelReport(){
@@ -179,15 +200,13 @@
       radio:function(e){
         this.setData({
           guige_key02: e.currentTarget.dataset.id
-        })
-        console.log(e.currentTarget.dataset.id)
+        });
+        this.$apply();
       },
       // 发货地址选择,获取用户选择的单选框的值
       radioChange: function (e) {
-        this.setData({
-          arr_guige02: e.detail.value
-        })
-        console.log(e.detail.value)
+        console.log(e);
+        this.reportType = e.detail.value;
       },
       lookImage(index) {
         let currentImage =  this.imageUrl + this.userInfo.photoList[index];
@@ -377,5 +396,27 @@
   .user-sex {
     margin-top: 10rpx;
     margin-bottom: 25rpx;
+  }
+  .show_button{
+    margin:3px;
+    font-size:13px;
+    color:white;
+    background-color:rgba(255,165,0,1);
+    border:1px solid coral;
+    border-radius:20px;
+  }
+  .show_tag{
+    margin: 10px;
+    text-align: center;
+    .show_button{
+      margin-right:10px;
+      color:white;
+      background-color:#ffa500;
+      border:1px solid coral;
+      font-size:13px;
+      display:inline-block;
+      border-radius:15px;
+
+    }
   }
 </style>
