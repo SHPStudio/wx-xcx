@@ -38,7 +38,7 @@
               }
             ]
           }).then((e) => {
-            wx.setStorageSync(this.$parent.globalData.userInfoSessionKey, e.detail.userInfo);
+            wx.setStorageSync(this.$parent.globalData.userInfoStorageKey, e.detail.userInfo);
             wx.navigateBack();
           }).catch(() => {
             console.log('=== dialog ===', 'type: cancel');
